@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#0f766e" />
+  <title>Anggaran Keluarga</title>
+  <link rel="manifest" href="manifest.json" />
+  <style>
+    :root {
+      --primary: #0f766e;
+      --primary-dark: #115e59;
+      --bg: #f3f6f5;
+      --card: #ffffff;
+      --text: #1e293b;
+      --muted: #64748b;
+      --danger: #dc2626;
+      --warn: #d97706;
+      --ok: #16a34a;
+      --border: #e2e8f0;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; }
+    body { background: var(--bg); color: var(--text); padding-bottom: 40px; }
+    .container { max-width: 520px; margin: 0 auto; padding: 14px; }
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 16px;
+      margin-bottom: 14px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.03);
+    }
+    h1 { font-size: 1.25rem; color: var(--primary-dark); }
+    h2 { font-size: 1rem; margin-bottom: 10px; }
+    .muted { color: var(--muted); font-size: 0.85rem; }
+    .row-between { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+    .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 10px; }
+    .stat-box { background: #f8fafc; border: 1px solid var(--border); border-radius: 10px; padding: 10px; }
+    .stat-label { font-size: 0.72rem; color: var(--muted); }
+    .stat-val { font-size: 0.92rem; font-weight: 700; margin-top: 3px; }
+    .danger { color: var(--danger); }
+    .ok { color: var(--ok); }
+    label { display: block; font-size: 0.82rem; font-weight: 600; margin-top: 10px; margin-bottom: 4px; }
+    input, select, button {
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 10px;
+      border: 1px solid #cbd5e1;
+      font-size: 0.95rem;
+    }
+    button {
+      background: var(--primary);
+      color: #fff;
+      border: none;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 12px;
+    }
+    button:hover { background: var(--primary-dark); }
+    button.secondary { background: #e2e8f0; color: var(--text); }
+    button.small { width: auto; padding: 6px 10px; font-size: 0.8rem; margin-top: 0; }
+    .budget-item { border-top: 1px solid var(--border); padding: 10px 0; }
+    .budget-item:first-child { border-top: none; }
+    .bar-bg { height: 7px; background: #e2e8f0; border-radius: 99px; overflow: hidden; margin-top: 6px; }
+    .bar-fill { height: 100%; background: var(--ok); transition: width 0.25s; }
+    .bar-fill.warn { background: var(--warn); }
+    .bar-fill.danger { background: var(--danger); }
+    .tx-item { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-top: 1px solid var(--border); font-size: 0.88rem; }
+    .tx-item:first-child { border-top: none; }
+    .hidden { display: none; }
+    #statusMsg { font-size: 0.84rem; margin-top: 8px; color: var(--primary-dark); }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- SECTION LOGIN -->
+    <div id="authSection" class="card">
+      <h1>Anggaran Keluarga</h1>
+      <p class="muted">Masuk menggunakan akun yang didaftarkan di Firebase Authentication.</p>
+      <form id="loginForm">
+        <label for="loginEmail">Email</label>
+        <input type="email" id="loginEmail" required placeholder="nama@email.com" />
+        <label for="loginPass">Password</label>
+        <input type="password" id="loginPass" required placeholder="Password" />
+        <button type="submit">Masuk</button>
+      </form>
+      <p id="authError" class="danger" style="font-size:0.85rem; margin-top:8px;"></p>
+    </div>
+
+    <!-- SECTION APP -->
+    <div id="appSection" class="hidden">
+      <div class="card">
+        <div class="row-between">
+          <div>
+            <h1>Anggaran Keluarga</h1>
+            <div id="userInfo" class="muted"></div>
+          </div>
+          <button id="logoutBtn" class="secondary small">Keluar</button>
+        </div>
+
+        <label for="monthInput">Periode Bulan</label>
+        <input type="month" id="monthInput" />
+
+        <div class="grid-3">
+          <div class="stat-box">
+            <div class="stat-label">Gaji / Pemasukan</div>
+            <div id="incomeDisplay" class="stat-val">Rp7.000.000</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-label">Total Anggaran</div>
+            <div id="budgetTotalDisplay" class="stat-val">Rp0</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-label">Terpakai Bulan Ini</div>
+            <div id="spentTotalDisplay" class="stat-val">Rp0</div>
+          </div>
+        </div>
+
+        <div style="margin-top:10px; font-size:0.88rem;">
+          Selisih Anggaran vs Gaji: <strong id="diffIncomeDisplay"></strong> |
+          Sisa dari Anggaran: <strong id="remainBudgetDisplay"></strong>
+        </div>
+
+        <button id="seedBtn" class="secondary" style="margin-top:12px;">
+          Isi / Sinkronkan 24 Pos Anggaran Awal
+        </button>
+        <div id="statusMsg"></div>
+      </div>
+
+      <!-- FORM CATAT PENGELUARAN -->
+      <div class="card">
+        <h2>Catat Pengeluaran</h2>
+        <form id="txForm">
+          <label for="budgetSelect">Pos Anggaran</label>
+          <select id="budgetSelect" required></select>
+
+          <label for="txAmount">Nominal (Rp)</label>
+          <input type="number" id="txAmount" min="1" step="1" required placeholder="Contoh: 25000" />
+
+          <label for="txDate">Tanggal</label>
+          <input type="date" id="txDate" required />
+
+          <label for="txNote">Catatan (Opsional)</label>
+          <input type="text" id="txNote" placeholder="Contoh: Beli sayur / isi bensin" />
+
+          <button type="submit">Simpan Transaksi</button>
+        </form>
+      </div>
+
+      <!-- DAFTAR POS ANGGARAN -->
+      <div class="card">
+        <h2>Rekap Pos Anggaran</h2>
+        <div id="budgetList"><p class="muted">Memuat data...</p></div>
+      </div>
+
+      <!-- RIWAYAT TRANSAKSI -->
+      <div class="card">
+        <h2>Riwayat Transaksi Bulan Ini</h2>
+        <div id="txList"><p class="muted">Belum ada transaksi.</p></div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import {
+      getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged
+    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import {
+      getFirestore, collection, doc, setDoc, addDoc, deleteDoc,
+      query, where, onSnapshot
+    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyB6qBoa03coFn-H9pcIsYnuofT86r_6GEU",
+      authDomain: "anggaran-keluarga-641e3.firebaseapp.com",
+      projectId: "anggaran-keluarga-641e3",
+      storageBucket: "anggaran-keluarga-641e3.firebasestorage.app",
+      messagingSenderId: "295296286769",
+      appId: "1:295296286769:web:c56ca3ae7ece8632709510",
+      measurementId: "G-R9X9Q8T2ZN"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    const DEFAULT_INCOME = 7000000;
+    const DEFAULT_BUDGETS = [
+      { id: "angsuran_bri", name: "Angsuran BRI", category: "Cicilan & Utang", limit: 2000000 },
+      { id: "listrik", name: "Listrik", category: "Utilitas & Rumah", limit: 130000 },
+      { id: "pdam", name: "PDAM", category: "Utilitas & Rumah", limit: 140000 },
+      { id: "wifi", name: "WiFi", category: "Utilitas & Rumah", limit: 150000 },
+      { id: "arisan_papa", name: "Arisan papa", category: "Hiburan & Arisan", limit: 250000 },
+      { id: "arisan_mama", name: "Arisan mama", category: "Hiburan & Arisan", limit: 250000 },
+      { id: "belanja_bulanan", name: "Belanja bulanan", category: "Makan, Belanja & Jajan", limit: 500000 },
+      { id: "skincare", name: "Skincare", category: "Anak & Perawatan Diri", limit: 200000 },
+      { id: "day_care_anak", name: "Day care anak", category: "Anak & Perawatan Diri", limit: 70000 },
+      { id: "galon", name: "Galon", category: "Utilitas & Rumah", limit: 20000 },
+      { id: "bensin_kendaraan", name: "Bensin kendaraan", category: "Transportasi & Kendaraan", limit: 500000 },
+      { id: "gas", name: "Gas", category: "Utilitas & Rumah", limit: 30000 },
+      { id: "susu_anak", name: "Susu anak", category: "Anak & Perawatan Diri", limit: 100000 },
+      { id: "hiburan_jalan2", name: "Hiburan atau jalan-jalan", category: "Hiburan & Arisan", limit: 400000 },
+      { id: "jajan_anak_sekolah", name: "Jajan anak sekolah", category: "Makan, Belanja & Jajan", limit: 300000 },
+      { id: "jajan_anak_rumah", name: "Jajan anak di rumah", category: "Makan, Belanja & Jajan", limit: 150000 },
+      { id: "uang_harian_mamah", name: "Uang harian mamah", category: "Makan, Belanja & Jajan", limit: 800000 },
+      { id: "uang_ikan_sayur", name: "Uang ikan dan sayur", category: "Makan, Belanja & Jajan", limit: 400000 },
+      { id: "uang_jajan_papah", name: "Uang jajan papah", category: "Makan, Belanja & Jajan", limit: 200000 },
+      { id: "tabungan_anak", name: "Tabungan anak", category: "Tabungan & Cadangan", limit: 50000 },
+      { id: "beras", name: "Beras", category: "Makan, Belanja & Jajan", limit: 225000 },
+      { id: "paket", name: "Paket", category: "Utilitas & Rumah", limit: 50000 },
+      { id: "service_kendaraan", name: "Service kendaraan", category: "Transportasi & Kendaraan", limit: 160000 },
+      { id: "parkir_kendaraan", name: "Parkir kendaraan", category: "Transportasi & Kendaraan", limit: 50000 }
+    ];
+
+    const rupiah = (n) => "Rp" + Number(n || 0).toLocaleString("id-ID");
+
+    const authSection = document.getElementById("authSection");
+    const appSection = document.getElementById("appSection");
+    const userInfo = document.getElementById("userInfo");
+    const monthInput = document.getElementById("monthInput");
+    const txDateInput = document.getElementById("txDate");
+    const statusMsg = document.getElementById("statusMsg");
+
+    const now = new Date();
+    const pad = (x) => String(x).padStart(2, "0");
+    const currentMonth = `${now.getFullYear()}-${pad(now.getMonth() + 1)}`;
+    const todayStr = `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`;
+    monthInput.value = currentMonth;
+    txDateInput.value = todayStr;
+
+    let unsubBudgets = null;
+    let unsubTx = null;
+    let budgetsData = [];
+    let txData = [];
+
+    document.getElementById("loginForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      document.getElementById("authError").textContent = "";
+      try {
+        await signInWithEmailAndPassword(
+          auth,
+          document.getElementById("loginEmail").value.trim(),
+          document.getElementById("loginPass").value
+        );
+      } catch (err) {
+        document.getElementById("authError").textContent = "Gagal masuk: " + err.message;
+      }
+    });
+
+    document.getElementById("logoutBtn").addEventListener("click", () => signOut(auth));
+
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        authSection.classList.add("hidden");
+        appSection.classList.remove("hidden");
+        userInfo.textContent = `Login sebagai: ${user.email}`;
+        subscribeMonth(monthInput.value);
+      } else {
+        authSection.classList.remove("hidden");
+        appSection.classList.add("hidden");
+        if (unsubBudgets) unsubBudgets();
+        if (unsubTx) unsubTx();
+      }
+    });
+
+    monthInput.addEventListener("change", () => {
+      if (auth.currentUser) subscribeMonth(monthInput.value);
+    });
+
+    function subscribeMonth(month) {
+      if (unsubBudgets) unsubBudgets();
+      if (unsubTx) unsubTx();
+
+      const qBudgets = query(collection(db, "budgets"), where("month", "==", month));
+      unsubBudgets = onSnapshot(qBudgets, (snap) => {
+        budgetsData = snap.docs.map((d) => ({ docId: d.id, ...d.data() }));
+        renderAll();
+      });
+
+      const qTx = query(collection(db, "transactions"), where("month", "==", month));
+      unsubTx = onSnapshot(qTx, (snap) => {
+        txData = snap.docs.map((d) => ({ id: d.id, ...d.data() }))
+          .sort((a, b) => (b.date || "").localeCompare(a.date || ""));
+        renderAll();
+      });
+    }
+
+    document.getElementById("seedBtn").addEventListener("click", async () => {
+      const month = monthInput.value;
+      statusMsg.textContent = "Menyimpan 24 pos anggaran ke Firestore...";
+      try {
+        for (const item of DEFAULT_BUDGETS) {
+          const docId = `${month}_${item.id}`;
+          await setDoc(doc(db, "budgets", docId), {
+            id: item.id,
+            name: item.name,
+            category: item.category,
+            limit: item.limit,
+            month
+          });
+        }
+        statusMsg.textContent = `Berhasil menyinkronkan ${DEFAULT_BUDGETS.length} pos anggaran untuk bulan ${month}.`;
+      } catch (err) {
+        statusMsg.textContent = "Gagal menyimpan pos: " + err.message;
+      }
+    });
+
+    document.getElementById("txForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const budgetId = document.getElementById("budgetSelect").value;
+      const amount = Number(document.getElementById("txAmount").value);
+      const date = document.getElementById("txDate").value;
+      const note = document.getElementById("txNote").value.trim();
+      const month = date.slice(0, 7) || monthInput.value;
+
+      const selectedBudget = budgetsData.find((b) => b.id === budgetId);
+      try {
+        await addDoc(collection(db, "transactions"), {
+          budgetId,
+          budgetName: selectedBudget ? selectedBudget.name : budgetId,
+          amount,
+          date,
+          month,
+          note,
+          createdBy: auth.currentUser ? auth.currentUser.email : "unknown",
+          createdAt: new Date().toISOString()
+        });
+        document.getElementById("txAmount").value = "";
+        document.getElementById("txNote").value = "";
+        statusMsg.textContent = "Transaksi tersimpan.";
+      } catch (err) {
+        statusMsg.textContent = "Gagal simpan transaksi: " + err.message;
+      }
+    });
+
+    function renderAll() {
+      const selectEl = document.getElementById("budgetSelect");
+      const currentSelected = selectEl.value;
+      selectEl.innerHTML = budgetsData.length
+        ? budgetsData.map((b) => `<option value="${b.id}">${b.name} (${rupiah(b.limit)})</option>`).join("")
+        : `<option value="">-- Klik 'Isi / Sinkronkan 24 Pos Anggaran Awal' dulu --</option>`;
+      if (currentSelected && budgetsData.some((b) => b.id === currentSelected)) {
+        selectEl.value = currentSelected;
+      }
+
+      const spentByBudget = {};
+      let totalSpent = 0;
+      for (const tx of txData) {
+        const amt = Number(tx.amount || 0);
+        totalSpent += amt;
+        spentByBudget[tx.budgetId] = (spentByBudget[tx.budgetId] || 0) + amt;
+      }
+
+      const totalBudget = budgetsData.reduce((acc, b) => acc + Number(b.limit || 0), 0);
+      const diffVsIncome = DEFAULT_INCOME - totalBudget;
+      const remainBudget = totalBudget - totalSpent;
+
+      document.getElementById("incomeDisplay").textContent = rupiah(DEFAULT_INCOME);
+      document.getElementById("budgetTotalDisplay").textContent = rupiah(totalBudget);
+      document.getElementById("spentTotalDisplay").textContent = rupiah(totalSpent);
+
+      const diffEl = document.getElementById("diffIncomeDisplay");
+      diffEl.textContent = (diffVsIncome >= 0 ? "+" : "-") + rupiah(Math.abs(diffVsIncome));
+      diffEl.className = diffVsIncome >= 0 ? "ok" : "danger";
+
+      const remainEl = document.getElementById("remainBudgetDisplay");
+      remainEl.textContent = (remainBudget >= 0 ? "" : "-") + rupiah(Math.abs(remainBudget));
+      remainEl.className = remainBudget >= 0 ? "ok" : "danger";
+
+      const budgetListEl = document.getElementById("budgetList");
+      if (!budgetsData.length) {
+        budgetListEl.innerHTML = `<p class="muted">Belum ada pos anggaran untuk bulan ini.</p>`;
+      } else {
+        budgetListEl.innerHTML = budgetsData.map((b) => {
+          const spent = spentByBudget[b.id] || 0;
+          const limit = Number(b.limit || 0);
+          const pct = limit > 0 ? Math.min(100, Math.round((spent / limit) * 100)) : 0;
+          const barClass = spent > limit ? "danger" : pct >= 80 ? "warn" : "";
+          return `
+            <div class="budget-item">
+              <div class="row-between">
+                <div>
+                  <strong>${b.name}</strong>
+                  <div class="muted">${b.category}</div>
+                </div>
+                <div style="text-align:right; font-size:0.86rem;">
+                  <div>${rupiah(spent)} / ${rupiah(limit)}</div>
+                  <div class="muted">Sisa: ${rupiah(limit - spent)}</div>
+                </div>
+              </div>
+              <div class="bar-bg"><div class="bar-fill ${barClass}" style="width:${pct}%"></div></div>
+            </div>
+          `;
+        }).join("");
+      }
+
+      const txListEl = document.getElementById("txList");
+      if (!txData.length) {
+        txListEl.innerHTML = `<p class="muted">Belum ada transaksi tercatat di bulan ini.</p>`;
+      } else {
+        txListEl.innerHTML = txData.map((tx) => `
+          <div class="tx-item">
+            <div>
+              <div><strong>${tx.budgetName || tx.budgetId}</strong> ${tx.note ? `- <span class="muted">${tx.note}</span>` : ""}</div>
+              <div class="muted">${tx.date || ""} • ${tx.createdBy || ""}</div>
+            </div>
+            <div style="display:flex; align-items:center; gap:8px;">
+              <strong>${rupiah(tx.amount)}</strong>
+              <button class="secondary small" data-del="${tx.id}">Hapus</button>
+            </div>
+          </div>
+        `).join("");
+
+        txListEl.querySelectorAll("[data-del]").forEach((btn) => {
+          btn.addEventListener("click", async () => {
+            await deleteDoc(doc(db, "transactions", btn.getAttribute("data-del")));
+          });
+        });
+      }
+    }
+  </script>
+</body>
+</html>
