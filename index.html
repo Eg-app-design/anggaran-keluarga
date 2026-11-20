@@ -101,6 +101,13 @@
       background: #fff;
       color: var(--text);
     }
+    input[type="month"] {
+      background: #ccfbf1;
+      color: #115e59;
+      border: 1.5px solid #0d9488;
+      font-weight: 700;
+      color-scheme: light;
+    }
     input:focus, select:focus { outline: 2px solid rgba(13, 148, 136, 0.25); border-color: var(--primary); }
 
     button {
@@ -143,7 +150,6 @@
       box-shadow: 0 2px 6px rgba(15, 23, 42, 0.08);
     }
 
-    /* Grafik & Bar Visual */
     .chart-card {
       background: var(--soft);
       border: 1px solid var(--border);
@@ -227,7 +233,7 @@
 
       <div class="card">
         <div class="row-between">
-          <label for="monthInput" style="margin-top:0;">Periode Bulan</label>
+          <label for="monthInput" style="margin-top:0; color:#0f766e;">Periode Bulan</label>
           <span id="monthBadge" class="badge badge-ok">Aktif</span>
         </div>
         <input type="month" id="monthInput" />
@@ -258,7 +264,7 @@
         <button type="button" class="tab-btn" data-tab="tabRincian">Item</button>
       </div>
 
-      <!-- TAB 1: DASHBOARD (TANPA FORM CATAT, PAKAI GRAFIK) -->
+      <!-- TAB 1: DASHBOARD -->
       <div id="tabDashboard">
         <div class="card">
           <h2>Ringkasan Anggaran & Pengeluaran</h2>
@@ -279,7 +285,6 @@
             </div>
           </div>
 
-          <!-- FORM EDIT TOTAL ANGGARAN MANUAL -->
           <div id="budgetEditRow" class="sub-box hidden">
             <label for="manualTotalBudgetInput" style="margin-top:0;">Atur Total Anggaran Bulan Ini (Rp)</label>
             <div class="inline-edit">
@@ -310,13 +315,11 @@
           </div>
         </div>
 
-        <!-- GRAFIK KOMPOSISI Gaji, Anggaran & Terpakai -->
         <div class="card">
           <h2>Grafik Ringkasan Bulan Ini</h2>
           <div id="overviewChart" class="chart-card"></div>
         </div>
 
-        <!-- GRAFIK TOP POS TERPAKAI -->
         <div class="card">
           <div class="row-between">
             <h2 style="margin-bottom:0;">Grafik Pemakaian per Pos</h2>
@@ -358,7 +361,7 @@
         </div>
       </div>
 
-      <!-- TAB 3: REKAP ANGGARAN (PILIH LIST LAMA + EDIT ANGKA + ISI MANUAL) -->
+      <!-- TAB 3: REKAP ANGGARAN -->
       <div id="tabRekap" class="hidden">
         <div class="card">
           <h2>Rekap Anggaran (Pilih List Lama / Isi Manual)</h2>
@@ -515,9 +518,9 @@
     monthInput.value = currentMonth;
     txDateInput.value = todayStr;
 
-    // Isi dropdown list lama
+    // Isi dropdown list lama tanpa nominal/Rp
     presetSelect.innerHTML = PREVIOUS_LIST.map((item, idx) =>
-      `<option value="${idx}">${item.name} — ${rupiah(item.limit)}</option>`
+      `<option value="${idx}">${item.name}</option>`
     ).join("");
 
     function syncPresetToForm() {
@@ -581,7 +584,7 @@
     let unsubTx = null;
 
     let monthlyIncome = DEFAULT_INCOME;
-    let customTotalBudget = null; // null = ikut jumlah pos otomatis
+    let customTotalBudget = null;
     let budgetsData = [];
     let subItemsData = [];
     let txData = [];
@@ -706,7 +709,7 @@
       }
     });
 
-    // Simpan / Update Pos Anggaran (List Lama + Edit Angka / Manual)
+    // Simpan / Update Pos Anggaran
     document.getElementById("rekapForm").addEventListener("submit", async (e) => {
       e.preventDefault();
       const month = monthInput.value;
@@ -768,7 +771,6 @@
       }
     });
 
-    // Sinkronkan dropdown rincian item saat pos berubah
     function populateSubItemDropdown() {
       const selectedBudgetId = txBudgetSelect.value;
       const matching = subItemsData.filter((s) => s.budgetId === selectedBudgetId);
@@ -832,7 +834,6 @@
       document.getElementById("subTargetBudget").innerHTML = budgetOptionsHtml;
       populateSubItemDropdown();
 
-      // Hitung pengeluaran harian, mingguan, dan bulanan
       const sevenDaysAgo = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 6);
       const sevenDaysStr = `${sevenDaysAgo.getFullYear()}-${pad(sevenDaysAgo.getMonth() + 1)}-${pad(sevenDaysAgo.getDate())}`;
 
@@ -864,7 +865,7 @@
       document.getElementById("totalBudgetDisplay").textContent = rupiah(effectiveTotalBudget);
       document.getElementById("budgetModeNote").textContent =
         customTotalBudget !== null
-          ? `Mode manual (Pos: ${rupiah(autoBudgetSum)})`
+          ? `Mode manual 
           : "Otomatis dari jumlah pos";
 
       document.getElementById("dailySpentDisplay").textContent = rupiah(dailySpent);
@@ -879,7 +880,6 @@
       remEl.textContent = (remainIncome >= 0 ? "" : "-") + rupiah(Math.abs(remainIncome));
       remEl.className = remainIncome >= 0 ? "ok" : "danger";
 
-      // Grafik Ringkasan (Gaji vs Total Anggaran vs Terpakai)
       const maxScale = Math.max(monthlyIncome, effectiveTotalBudget, monthlySpent, 1);
       const pctBudgetVsMax = Math.min(100, Math.round((effectiveTotalBudget / maxScale) * 100));
       const pctSpentVsMax = Math.min(100, Math.round((monthlySpent / maxScale) * 100));
@@ -909,7 +909,6 @@
         </div>
       `;
 
-      // Grafik Pemakaian per Pos
       const topChartEl = document.getElementById("topBudgetChart");
       if (!budgetsData.length) {
         topChartEl.innerHTML = `<p class="muted">Belum ada pos anggaran untuk digrafikkan.</p>`;
@@ -936,7 +935,6 @@
         }).join("");
       }
 
-      // Daftar Rekap Pos di Tab Rekap + Edit & Hapus
       const rekapListEl = document.getElementById("rekapList");
       if (!budgetsData.length) {
         rekapListEl.innerHTML = `<p class="muted">Belum ada pos anggaran pada bulan ini.</p>`;
@@ -986,7 +984,6 @@
         });
       }
 
-      // Breakdown Pos + Rincian Item di Tab Item
       const detailEl = document.getElementById("detailBreakdownList");
       if (!budgetsData.length) {
         detailEl.innerHTML = `<p class="muted">Tambahkan pos anggaran terlebih dahulu.</p>`;
@@ -1028,7 +1025,6 @@
         });
       }
 
-      // Riwayat Transaksi di Tab Catat
       const txListEl = document.getElementById("txList");
       if (!txData.length) {
         txListEl.innerHTML = `<p class="muted">Belum ada transaksi tercatat di bulan ini.</p>`;
