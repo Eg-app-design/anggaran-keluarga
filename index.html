@@ -102,11 +102,12 @@
       color: #0f172a;
       color-scheme: light;
     }
-    input[type="month"] {
+    select.month-picker {
       background: #ccfbf1;
       color: #0f172a;
       border: 1.5px solid #0d9488;
       font-weight: 700;
+      margin-top: 0;
     }
     input:focus, select:focus { outline: 2px solid rgba(13, 148, 136, 0.25); border-color: var(--primary); }
 
@@ -236,10 +237,31 @@
 
       <div class="card">
         <div class="row-between">
-          <label for="monthInput" style="margin-top:0; color:#0f766e;">Periode Bulan</label>
+          <span style="font-size:0.8rem; font-weight:700; color:#0f766e;">Periode Bulan</span>
           <span id="monthBadge" class="badge badge-ok">Aktif</span>
         </div>
-        <input type="month" id="monthInput" />
+        <div class="grid-2" style="margin-top:6px;">
+          <select id="monthSelect" class="month-picker" aria-label="Pilih Bulan">
+            <option value="01">Januari</option>
+            <option value="02">Februari</option>
+            <option value="03">Maret</option>
+            <option value="04">April</option>
+            <option value="05">Mei</option>
+            <option value="06">Juni</option>
+            <option value="07">Juli</option>
+            <option value="08">Agustus</option>
+            <option value="09">September</option>
+            <option value="10">Oktober</option>
+            <option value="11">November</option>
+            <option value="12">Desember</option>
+          </select>
+          <select id="yearSelect" class="month-picker" aria-label="Pilih Tahun">
+            <option value="2025">2025</option>
+            <option value="2026">2026</option>
+            <option value="2027">2027</option>
+            <option value="2028">2028</option>
+          </select>
+        </div>
         <div class="quick-months">
           <button type="button" id="prevMonthBtn" class="secondary">Bulan Lalu</button>
           <button type="button" id="currMonthBtn" class="secondary">Bulan Ini</button>
@@ -289,7 +311,6 @@
                 <button type="button" id="toggleBudgetEditBtn" class="secondary small" style="padding:2px 7px; font-size:0.7rem;">Edit</button>
               </div>
               <div id="totalBudgetDisplay" class="stat-val">Rp0</div>
-              <div id="budgetModeNote" class="muted" style="font-size:0.68rem;">Otomatis dari pos</div>
             </div>
           </div>
 
@@ -518,7 +539,8 @@
     const authSection = document.getElementById("authSection");
     const appSection = document.getElementById("appSection");
     const userInfo = document.getElementById("userInfo");
-    const monthInput = document.getElementById("monthInput");
+    const monthSelect = document.getElementById("monthSelect");
+    const yearSelect = document.getElementById("yearSelect");
     const txDateInput = document.getElementById("txDate");
     const statusMsg = document.getElementById("statusMsg");
     const presetSelect = document.getElementById("presetSelect");
@@ -532,29 +554,46 @@
     const txSubItemSelect = document.getElementById("txSubItemSelect");
     const txAmountInput = document.getElementById("txAmount");
 
-    monthInput.value = currentMonth;
+    function getSelectedMonth() {
+      return `${yearSelect.value}-${monthSelect.value}`;
+    }
+
+    function setSelectedMonth(ymStr) {
+      const parts = (ymStr || currentMonth).split("-");
+      const y = parts[0] || String(now.getFullYear());
+      const m = parts[1] || pad(now.getMonth() + 1);
+      if (![...yearSelect.options].some((o) => o.value === y)) {
+        const opt = document.createElement("option");
+        opt.value = y;
+        opt.textContent = y;
+        yearSelect.appendChild(opt);
+      }
+      yearSelect.value = y;
+      monthSelect.value = m;
+    }
+
+    setSelectedMonth(currentMonth);
     txDateInput.value = todayStr;
 
     function handleMonthChange() {
-      if (!monthInput.value) monthInput.value = currentMonth;
-      if (auth.currentUser) subscribeMonth(monthInput.value);
+      if (auth.currentUser) subscribeMonth(getSelectedMonth());
     }
 
-    monthInput.addEventListener("change", handleMonthChange);
+    monthSelect.addEventListener("change", handleMonthChange);
+    yearSelect.addEventListener("change", handleMonthChange);
     document.getElementById("prevMonthBtn").addEventListener("click", () => {
-      monthInput.value = shiftMonth(monthInput.value, -1);
+      setSelectedMonth(shiftMonth(getSelectedMonth(), -1));
       handleMonthChange();
     });
     document.getElementById("currMonthBtn").addEventListener("click", () => {
-      monthInput.value = currentMonth;
+      setSelectedMonth(currentMonth);
       handleMonthChange();
     });
     document.getElementById("nextMonthBtn").addEventListener("click", () => {
-      monthInput.value = shiftMonth(monthInput.value, 1);
+      setSelectedMonth(shiftMonth(getSelectedMonth(), 1));
       handleMonthChange();
     });
 
-    // Isi dropdown list lama tanpa nominal/Rp
     presetSelect.innerHTML = PREVIOUS_LIST.map((item, idx) =>
       `<option value="${idx}">${item.name}</option>`
     ).join("");
@@ -585,7 +624,6 @@
       }
     });
 
-    // Navigasi 4 Tab
     document.querySelectorAll(".tab-btn").forEach((btn) => {
       btn.addEventListener("click", () => {
         document.querySelectorAll(".tab-btn").forEach((b) => b.classList.remove("active"));
@@ -597,7 +635,6 @@
       });
     });
 
-    // Auth
     document.getElementById("loginForm").addEventListener("submit", async (e) => {
       e.preventDefault();
       document.getElementById("authError").textContent = "";
@@ -631,7 +668,7 @@
         authSection.classList.add("hidden");
         appSection.classList.remove("hidden");
         userInfo.textContent = user.email;
-        subscribeMonth(monthInput.value);
+        subscribeMonth(getSelectedMonth());
       } else {
         authSection.classList.remove("hidden");
         appSection.classList.add("hidden");
@@ -675,7 +712,6 @@
       });
     }
 
-    // Edit Gaji / Pemasukan
     document.getElementById("toggleIncomeEditBtn").addEventListener("click", () => {
       const row = document.getElementById("incomeEditRow");
       row.classList.toggle("hidden");
@@ -683,7 +719,7 @@
     });
 
     document.getElementById("saveIncomeBtn").addEventListener("click", async () => {
-      const month = monthInput.value;
+      const month = getSelectedMonth();
       const val = Number(document.getElementById("incomeInput").value || 0);
       try {
         await setDoc(doc(db, "monthly_settings", month), {
@@ -700,7 +736,6 @@
       }
     });
 
-    // Edit Total Anggaran Manual / Kembali ke Otomatis
     document.getElementById("toggleBudgetEditBtn").addEventListener("click", () => {
       const row = document.getElementById("budgetEditRow");
       row.classList.toggle("hidden");
@@ -709,7 +744,7 @@
     });
 
     document.getElementById("saveManualBudgetBtn").addEventListener("click", async () => {
-      const month = monthInput.value;
+      const month = getSelectedMonth();
       const val = Number(document.getElementById("manualTotalBudgetInput").value || 0);
       try {
         await setDoc(doc(db, "monthly_settings", month), {
@@ -727,7 +762,7 @@
     });
 
     document.getElementById("resetAutoBudgetBtn").addEventListener("click", async () => {
-      const month = monthInput.value;
+      const month = getSelectedMonth();
       try {
         await setDoc(doc(db, "monthly_settings", month), {
           month,
@@ -743,10 +778,9 @@
       }
     });
 
-    // Simpan / Update Pos Anggaran
     document.getElementById("rekapForm").addEventListener("submit", async (e) => {
       e.preventDefault();
-      const month = monthInput.value;
+      const month = getSelectedMonth();
       let name = "";
       if (rekapMode.value === "preset") {
         const preset = PREVIOUS_LIST[Number(presetSelect.value || 0)];
@@ -778,10 +812,9 @@
       }
     });
 
-    // Tambah Rincian Item dalam Pos Anggaran
     document.getElementById("subItemForm").addEventListener("submit", async (e) => {
       e.preventDefault();
-      const month = monthInput.value;
+      const month = getSelectedMonth();
       const budgetId = document.getElementById("subTargetBudget").value;
       const itemName = document.getElementById("subItemName").value.trim();
       const limit = Number(document.getElementById("subItemLimit").value || 0);
@@ -805,7 +838,6 @@
       }
     });
 
-    // Isi otomatis nominal sesuai anggaran pos / item (tetap bisa diubah manual)
     function applySuggestedAmount(forceFill = false) {
       const selectedBudgetId = txBudgetSelect.value;
       const selectedSubId = txSubItemSelect.value;
@@ -846,7 +878,6 @@
       applySuggestedAmount(true);
     });
 
-    // Simpan Pengeluaran
     document.getElementById("txForm").addEventListener("submit", async (e) => {
       e.preventDefault();
       const budgetId = txBudgetSelect.value;
@@ -854,7 +885,7 @@
       const amount = Number(txAmountInput.value);
       const date = txDateInput.value;
       const note = document.getElementById("txNote").value.trim();
-      const month = date.slice(0, 7) || monthInput.value;
+      const month = date.slice(0, 7) || getSelectedMonth();
 
       if (!budgetId) {
         statusMsg.textContent = "Tambahkan pos anggaran terlebih dahulu di tab Rekap.";
@@ -937,10 +968,6 @@
 
       document.getElementById("posCountDisplay").textContent = `${budgetsData.length} Pos`;
       document.getElementById("totalBudgetDisplay").textContent = rupiah(effectiveTotalBudget);
-      document.getElementById("budgetModeNote").textContent =
-        customTotalBudget !== null
-          ? `Mode manual (Pos: ${rupiah(autoBudgetSum)})`
-          : "Otomatis dari jumlah pos";
 
       document.getElementById("dailySpentDisplay").textContent = rupiah(dailySpent);
       document.getElementById("weeklySpentDisplay").textContent = rupiah(weeklySpent);
