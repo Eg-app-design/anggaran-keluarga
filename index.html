@@ -865,7 +865,7 @@
       document.getElementById("totalBudgetDisplay").textContent = rupiah(effectiveTotalBudget);
       document.getElementById("budgetModeNote").textContent =
         customTotalBudget !== null
-          ? `Mode manual 
+          ? `Mode manual (Pos: ${rupiah(autoBudgetSum)})`
           : "Otomatis dari jumlah pos";
 
       document.getElementById("dailySpentDisplay").textContent = rupiah(dailySpent);
