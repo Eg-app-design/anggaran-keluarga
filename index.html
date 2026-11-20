@@ -393,7 +393,10 @@
       <!-- TAB 3: REKAP ANGGARAN -->
       <div id="tabRekap" class="hidden">
         <div class="card">
-          <h2>Rekap Anggaran (Pilih List Lama / Isi Manual)</h2>
+          <div class="row-between">
+            <h2 style="margin-bottom:0;">Rekap Anggaran (Pilih List Lama / Isi Manual)</h2>
+            <button type="button" id="cancelEditBudgetBtn" class="secondary small hidden">Batal Edit</button>
+          </div>
           <form id="rekapForm">
             <label for="rekapMode">Sumber Pos</label>
             <select id="rekapMode">
@@ -550,9 +553,32 @@
     const manualBudgetName = document.getElementById("manualBudgetName");
     const rekapCategory = document.getElementById("rekapCategory");
     const rekapLimit = document.getElementById("rekapLimit");
+    const cancelEditBudgetBtn = document.getElementById("cancelEditBudgetBtn");
     const txBudgetSelect = document.getElementById("txBudgetSelect");
     const txSubItemSelect = document.getElementById("txSubItemSelect");
     const txAmountInput = document.getElementById("txAmount");
+
+    let editingBudgetDocId = null;
+
+    function resetRekapFormState() {
+      editingBudgetDocId = null;
+      cancelEditBudgetBtn.classList.add("hidden");
+      if (rekapMode.value === "preset") {
+        presetWrapper.classList.remove("hidden");
+        manualNameWrapper.classList.add("hidden");
+        syncPresetToForm();
+      } else {
+        presetWrapper.classList.add("hidden");
+        manualNameWrapper.classList.remove("hidden");
+        manualBudgetName.value = "";
+        rekapLimit.value = "";
+      }
+    }
+
+    cancelEditBudgetBtn.addEventListener("click", () => {
+      resetRekapFormState();
+      statusMsg.textContent = "Mode edit dibatalkan.";
+    });
 
     function getSelectedMonth() {
       return `${yearSelect.value}-${monthSelect.value}`;
@@ -576,6 +602,8 @@
     txDateInput.value = todayStr;
 
     function handleMonthChange() {
+      editingBudgetDocId = null;
+      cancelEditBudgetBtn.classList.add("hidden");
       if (auth.currentUser) subscribeMonth(getSelectedMonth());
     }
 
@@ -612,6 +640,8 @@
     });
 
     rekapMode.addEventListener("change", () => {
+      editingBudgetDocId = null;
+      cancelEditBudgetBtn.classList.add("hidden");
       if (rekapMode.value === "preset") {
         presetWrapper.classList.remove("hidden");
         manualNameWrapper.classList.add("hidden");
@@ -778,6 +808,7 @@
       }
     });
 
+    // Simpan / Update Pos Anggaran (dan hapus dokumen lama jika nama di-rename saat edit)
     document.getElementById("rekapForm").addEventListener("submit", async (e) => {
       e.preventDefault();
       const month = getSelectedMonth();
@@ -794,6 +825,8 @@
 
       const budgetId = slugify(name);
       const docId = `${month}_${budgetId}`;
+      const previousDocId = editingBudgetDocId;
+
       try {
         await setDoc(doc(db, "budgets", docId), {
           id: budgetId,
@@ -802,10 +835,10 @@
           limit,
           month
         });
-        if (rekapMode.value === "manual") {
-          manualBudgetName.value = "";
-          rekapLimit.value = "";
+        if (previousDocId && previousDocId !== docId) {
+          await deleteDoc(doc(db, "budgets", previousDocId));
         }
+        resetRekapFormState();
         statusMsg.textContent = `Pos "${name}" (${rupiah(limit)}) tersimpan untuk ${month}.`;
       } catch (err) {
         statusMsg.textContent = "Gagal simpan pos: " + err.message;
@@ -1067,20 +1100,27 @@
           btn.addEventListener("click", () => {
             const target = budgetsData.find((item) => item.id === btn.getAttribute("data-edit-budget"));
             if (!target) return;
+            editingBudgetDocId = target.docId;
+            cancelEditBudgetBtn.classList.remove("hidden");
             rekapMode.value = "manual";
             presetWrapper.classList.add("hidden");
             manualNameWrapper.classList.remove("hidden");
             manualBudgetName.value = target.name;
             rekapCategory.value = target.category || "Lainnya";
             rekapLimit.value = target.limit;
-            statusMsg.textContent = `Mengedit pos "${target.name}". Ubah nominal lalu klik Simpan / Update.`;
+            statusMsg.textContent = `Mengedit pos "${target.name}". Ubah nama/nominal lalu klik Simpan / Update.`;
             window.scrollTo({ top: 0, behavior: "smooth" });
           });
         });
 
         rekapListEl.querySelectorAll("[data-del-budget]").forEach((btn) => {
           btn.addEventListener("click", async () => {
-            await deleteDoc(doc(db, "budgets", btn.getAttribute("data-del-budget")));
+            const targetDocId = btn.getAttribute("data-del-budget");
+            if (editingBudgetDocId === targetDocId) {
+              editingBudgetDocId = null;
+              cancelEditBudgetBtn.classList.add("hidden");
+            }
+            await deleteDoc(doc(db, "budgets", targetDocId));
           });
         });
       }
