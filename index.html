@@ -3,92 +3,182 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="theme-color" content="#0f766e" />
+  <meta name="theme-color" content="#0d9488" />
   <title>Anggaran Keluarga</title>
   <link rel="manifest" href="manifest.json" />
   <style>
     :root {
-      --primary: #0f766e;
-      --primary-dark: #115e59;
-      --bg: #f1f5f4;
+      --primary: #0d9488;
+      --primary-dark: #0f766e;
+      --primary-soft: #ccfbf1;
+      --accent: #2563eb;
+      --bg: #eef3f2;
       --card: #ffffff;
       --text: #0f172a;
       --muted: #64748b;
       --danger: #dc2626;
+      --danger-soft: #fee2e2;
       --warn: #d97706;
+      --warn-soft: #fef3c7;
       --ok: #16a34a;
+      --ok-soft: #dcfce7;
       --border: #e2e8f0;
       --soft: #f8fafc;
     }
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; }
-    body { background: var(--bg); color: var(--text); padding-bottom: 48px; }
-    .container { max-width: 560px; margin: 0 auto; padding: 12px; }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+    body { background: var(--bg); color: var(--text); padding-bottom: 56px; }
+    .container { max-width: 580px; margin: 0 auto; padding: 12px; }
+
+    .hero-header {
+      background: linear-gradient(135deg, #0f766e 0%, #0d9488 55%, #0284c7 100%);
+      color: #fff;
+      border-radius: 18px;
+      padding: 16px;
+      margin-bottom: 12px;
+      box-shadow: 0 8px 20px rgba(13, 148, 136, 0.2);
+    }
+    .hero-header h1 { font-size: 1.25rem; font-weight: 700; letter-spacing: -0.2px; }
+    .hero-sub { font-size: 0.78rem; opacity: 0.9; margin-top: 2px; }
+    .hero-top { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+    .ghost-btn {
+      width: auto;
+      margin-top: 0;
+      padding: 6px 12px;
+      font-size: 0.78rem;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.18);
+      color: #fff;
+      border: 1px solid rgba(255,255,255,0.35);
+      backdrop-filter: blur(4px);
+    }
+    .ghost-btn:hover { background: rgba(255,255,255,0.28); }
+
     .card {
       background: var(--card);
       border: 1px solid var(--border);
-      border-radius: 14px;
+      border-radius: 16px;
       padding: 15px;
       margin-bottom: 12px;
-      box-shadow: 0 2px 6px rgba(15, 23, 42, 0.04);
+      box-shadow: 0 3px 10px rgba(15, 23, 42, 0.04);
     }
-    h1 { font-size: 1.2rem; color: var(--primary-dark); }
-    h2 { font-size: 1rem; margin-bottom: 10px; color: var(--text); }
-    h3 { font-size: 0.92rem; margin-bottom: 6px; color: var(--primary-dark); }
+    h2 { font-size: 1rem; margin-bottom: 10px; color: var(--text); font-weight: 700; }
     .muted { color: var(--muted); font-size: 0.8rem; }
     .row-between { display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; }
-    .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-top: 10px; }
+
+    .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-top: 8px; }
     .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 8px; }
-    .stat-box { background: var(--soft); border: 1px solid var(--border); border-radius: 10px; padding: 10px; }
-    .stat-label { font-size: 0.72rem; color: var(--muted); }
-    .stat-val { font-size: 0.92rem; font-weight: 700; margin-top: 3px; }
+
+    .stat-box {
+      background: var(--soft);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 10px;
+    }
+    .stat-label { font-size: 0.72rem; color: var(--muted); font-weight: 500; }
+    .stat-val { font-size: 0.94rem; font-weight: 700; margin-top: 4px; }
     .ok { color: var(--ok); }
     .warn { color: var(--warn); }
     .danger { color: var(--danger); }
-    label { display: block; font-size: 0.8rem; font-weight: 600; margin-top: 9px; margin-bottom: 4px; }
+
+    .badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-size: 0.72rem;
+      font-weight: 600;
+    }
+    .badge-ok { background: var(--ok-soft); color: var(--ok); }
+    .badge-warn { background: var(--warn-soft); color: var(--warn); }
+    .badge-danger { background: var(--danger-soft); color: var(--danger); }
+
+    label { display: block; font-size: 0.8rem; font-weight: 600; margin-top: 10px; margin-bottom: 4px; color: #334155; }
     input, select, button {
       width: 100%;
-      padding: 9px 11px;
-      border-radius: 10px;
+      padding: 10px 12px;
+      border-radius: 11px;
       border: 1px solid #cbd5e1;
       font-size: 0.92rem;
       background: #fff;
+      color: var(--text);
     }
+    input:focus, select:focus { outline: 2px solid rgba(13, 148, 136, 0.25); border-color: var(--primary); }
+
     button {
       background: var(--primary);
       color: #fff;
       border: none;
       font-weight: 600;
       cursor: pointer;
-      margin-top: 10px;
+      margin-top: 12px;
+      transition: transform 0.08s ease, background 0.15s ease;
     }
+    button:active { transform: scale(0.99); }
     button:hover { background: var(--primary-dark); }
     button.secondary { background: #e2e8f0; color: var(--text); }
     button.secondary:hover { background: #cbd5e1; }
-    button.danger-btn { background: #fee2e2; color: var(--danger); }
-    button.small { width: auto; padding: 6px 10px; font-size: 0.78rem; margin-top: 0; }
-    .nav-tabs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-bottom: 12px; }
-    .tab-btn { margin-top: 0; padding: 9px 8px; font-size: 0.82rem; background: #e2e8f0; color: var(--text); }
-    .tab-btn.active { background: var(--primary); color: #fff; }
-    .budget-item { border-top: 1px solid var(--border); padding: 11px 0; }
-    .budget-item:first-child { border-top: none; }
-    .bar-bg { height: 7px; background: #e2e8f0; border-radius: 99px; overflow: hidden; margin-top: 6px; }
-    .bar-fill { height: 100%; background: var(--ok); transition: width 0.25s; }
+    button.danger-btn { background: var(--danger-soft); color: var(--danger); }
+    button.small { width: auto; padding: 6px 10px; font-size: 0.78rem; margin-top: 0; border-radius: 9px; }
+
+    .nav-tabs {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 6px;
+      margin-bottom: 12px;
+      background: #e2e8f0;
+      padding: 4px;
+      border-radius: 14px;
+    }
+    .tab-btn {
+      margin-top: 0;
+      padding: 9px 6px;
+      font-size: 0.78rem;
+      border-radius: 10px;
+      background: transparent;
+      color: #334155;
+      font-weight: 600;
+    }
+    .tab-btn.active {
+      background: #fff;
+      color: var(--primary-dark);
+      box-shadow: 0 2px 6px rgba(15, 23, 42, 0.08);
+    }
+
+    /* Grafik & Bar Visual */
+    .chart-card {
+      background: var(--soft);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 12px;
+      margin-top: 10px;
+    }
+    .chart-row { margin-top: 9px; }
+    .chart-row:first-child { margin-top: 0; }
+    .bar-bg { height: 9px; background: #e2e8f0; border-radius: 999px; overflow: hidden; margin-top: 5px; }
+    .bar-fill { height: 100%; background: var(--ok); border-radius: 999px; transition: width 0.3s ease; }
+    .bar-fill.blue { background: var(--accent); }
+    .bar-fill.teal { background: var(--primary); }
     .bar-fill.warn { background: var(--warn); }
     .bar-fill.danger { background: var(--danger); }
+
     .sub-box {
       background: var(--soft);
       border: 1px dashed #cbd5e1;
-      border-radius: 10px;
-      padding: 9px 11px;
-      margin-top: 8px;
+      border-radius: 12px;
+      padding: 10px 12px;
+      margin-top: 10px;
     }
+    .inline-edit { display: flex; gap: 6px; margin-top: 8px; align-items: center; }
+    .inline-edit input { margin-top: 0; flex: 1; }
+
+    .budget-item { border-top: 1px solid var(--border); padding: 11px 0; }
+    .budget-item:first-child { border-top: none; }
     .sub-row {
       display: flex;
       justify-content: space-between;
       align-items: center;
       gap: 6px;
       font-size: 0.8rem;
-      padding: 5px 0;
+      padding: 6px 0;
       border-top: 1px solid #e2e8f0;
     }
     .sub-row:first-child { border-top: none; }
@@ -97,15 +187,13 @@
       justify-content: space-between;
       align-items: center;
       gap: 8px;
-      padding: 9px 0;
+      padding: 10px 0;
       border-top: 1px solid var(--border);
       font-size: 0.86rem;
     }
     .tx-item:first-child { border-top: none; }
     .hidden { display: none; }
-    #statusMsg { font-size: 0.82rem; margin-top: 8px; color: var(--primary-dark); font-weight: 500; }
-    .inline-edit { display: flex; gap: 6px; margin-top: 6px; }
-    .inline-edit input { margin-top: 0; }
+    #statusMsg { font-size: 0.82rem; margin-top: 8px; color: var(--primary-dark); font-weight: 600; }
   </style>
 </head>
 <body>
@@ -126,26 +214,31 @@
 
     <!-- APLIKASI -->
     <div id="appSection" class="hidden">
-      <!-- TOP HEADER & PERIODE -->
-      <div class="card">
-        <div class="row-between">
+      <!-- HEADER & PENGATURAN BULAN + GAJI -->
+      <div class="hero-header">
+        <div class="hero-top">
           <div>
             <h1>Anggaran Keluarga</h1>
-            <div id="userInfo" class="muted"></div>
+            <div id="userInfo" class="hero-sub"></div>
           </div>
-          <button id="logoutBtn" class="secondary small">Keluar</button>
+          <button type="button" id="logoutBtn" class="ghost-btn">Keluar</button>
         </div>
+      </div>
 
-        <label for="monthInput">Periode Bulan</label>
+      <div class="card">
+        <div class="row-between">
+          <label for="monthInput" style="margin-top:0;">Periode Bulan</label>
+          <span id="monthBadge" class="badge badge-ok">Aktif</span>
+        </div>
         <input type="month" id="monthInput" />
 
-        <!-- EDIT GAJI / PEMASUKAN -->
+        <!-- GAJI / PEMASUKAN BISA DIEDIT -->
         <div class="sub-box">
           <div class="row-between">
-            <span style="font-size:0.82rem; font-weight:600;">Gaji / Pemasukan Bulan Ini</span>
+            <span style="font-size:0.82rem; font-weight:700;">Gaji / Pemasukan Bulan Ini</span>
             <button type="button" id="toggleIncomeEditBtn" class="secondary small">Edit Gaji</button>
           </div>
-          <div id="incomeValueText" style="font-size:1.05rem; font-weight:700; margin-top:4px; color:var(--primary-dark);">
+          <div id="incomeValueText" style="font-size:1.1rem; font-weight:800; margin-top:4px; color:var(--primary-dark);">
             Rp7.000.000
           </div>
           <div id="incomeEditRow" class="inline-edit hidden">
@@ -157,25 +250,42 @@
         <div id="statusMsg"></div>
       </div>
 
-      <!-- NAVIGASI MENU -->
+      <!-- MENU NAVIGASI 4 TAB -->
       <div class="nav-tabs">
-        <button type="button" class="tab-btn active" data-tab="tabDashboard">Dashboard & Catat</button>
-        <button type="button" class="tab-btn" data-tab="tabRekap">Rekap Anggaran</button>
-        <button type="button" class="tab-btn" data-tab="tabRincian">Rincian Item</button>
+        <button type="button" class="tab-btn active" data-tab="tabDashboard">Dashboard</button>
+        <button type="button" class="tab-btn" data-tab="tabCatat">Catat</button>
+        <button type="button" class="tab-btn" data-tab="tabRekap">Rekap</button>
+        <button type="button" class="tab-btn" data-tab="tabRincian">Item</button>
       </div>
 
-      <!-- TAB 1: DASHBOARD & CATAT TRANSAKSI -->
+      <!-- TAB 1: DASHBOARD (TANPA FORM CATAT, PAKAI GRAFIK) -->
       <div id="tabDashboard">
         <div class="card">
-          <h2>Dashboard Bulanan</h2>
+          <h2>Ringkasan Anggaran & Pengeluaran</h2>
+
           <div class="grid-2">
             <div class="stat-box">
-              <div class="stat-label">List Sesuai Bulanan (Pos)</div>
+              <div class="stat-label">List Sesuai Bulanan</div>
               <div id="posCountDisplay" class="stat-val">0 Pos</div>
             </div>
+
             <div class="stat-box">
-              <div class="stat-label">Total Anggaran</div>
+              <div class="row-between">
+                <span class="stat-label">Total Anggaran</span>
+                <button type="button" id="toggleBudgetEditBtn" class="secondary small" style="padding:2px 7px; font-size:0.7rem;">Edit</button>
+              </div>
               <div id="totalBudgetDisplay" class="stat-val">Rp0</div>
+              <div id="budgetModeNote" class="muted" style="font-size:0.68rem;">Otomatis dari pos</div>
+            </div>
+          </div>
+
+          <!-- FORM EDIT TOTAL ANGGARAN MANUAL -->
+          <div id="budgetEditRow" class="sub-box hidden">
+            <label for="manualTotalBudgetInput" style="margin-top:0;">Atur Total Anggaran Bulan Ini (Rp)</label>
+            <div class="inline-edit">
+              <input type="number" id="manualTotalBudgetInput" min="0" step="1000" placeholder="Contoh: 6625000" />
+              <button type="button" id="saveManualBudgetBtn" class="small">Simpan</button>
+              <button type="button" id="resetAutoBudgetBtn" class="secondary small">Ikut Pos</button>
             </div>
           </div>
 
@@ -194,12 +304,30 @@
             </div>
           </div>
 
-          <div style="margin-top:10px; font-size:0.84rem; line-height:1.5;">
+          <div style="margin-top:10px; font-size:0.84rem; line-height:1.55;">
             <div>Selisih Anggaran vs Gaji: <strong id="diffIncomeDisplay"></strong></div>
-            <div>Sisa Saldo dari Gaji: <strong id="remainIncomeDisplay"></strong></div>
+            <div>Sisa Saldo Gaji vs Terpakai: <strong id="remainIncomeDisplay"></strong></div>
           </div>
         </div>
 
+        <!-- GRAFIK KOMPOSISI Gaji, Anggaran & Terpakai -->
+        <div class="card">
+          <h2>Grafik Ringkasan Bulan Ini</h2>
+          <div id="overviewChart" class="chart-card"></div>
+        </div>
+
+        <!-- GRAFIK TOP POS TERPAKAI -->
+        <div class="card">
+          <div class="row-between">
+            <h2 style="margin-bottom:0;">Grafik Pemakaian per Pos</h2>
+            <span class="muted">Terpakai vs Batas Pos</span>
+          </div>
+          <div id="topBudgetChart" class="chart-card"></div>
+        </div>
+      </div>
+
+      <!-- TAB 2: CATAT PENGELUARAN & RIWAYAT -->
+      <div id="tabCatat" class="hidden">
         <div class="card">
           <h2>Catat Pengeluaran</h2>
           <form id="txForm">
@@ -230,7 +358,7 @@
         </div>
       </div>
 
-      <!-- TAB 2: REKAP ANGGARAN (PILIHAN LIST LAMA + ISI MANUAL) -->
+      <!-- TAB 3: REKAP ANGGARAN (PILIH LIST LAMA + EDIT ANGKA + ISI MANUAL) -->
       <div id="tabRekap" class="hidden">
         <div class="card">
           <h2>Rekap Anggaran (Pilih List Lama / Isi Manual)</h2>
@@ -263,8 +391,8 @@
               <option value="Lainnya">Lainnya</option>
             </select>
 
-            <label for="rekapLimit">Nominal Anggaran Pos (Rp)</label>
-            <input type="number" id="rekapLimit" min="0" step="1000" required placeholder="Contoh: 500000" />
+            <label for="rekapLimit">Nominal / Harga Anggaran Pos (Rp — Bisa Diedit)</label>
+            <input type="number" id="rekapLimit" min="0" step="1000" required placeholder="Ketik atau ubah nominal (Rp)" />
 
             <button type="submit">Simpan / Update Pos Anggaran</button>
           </form>
@@ -276,7 +404,7 @@
         </div>
       </div>
 
-      <!-- TAB 3: RINCIAN ITEM DALAM POS ANGGARAN -->
+      <!-- TAB 4: RINCIAN ITEM DALAM POS ANGGARAN -->
       <div id="tabRincian" class="hidden">
         <div class="card">
           <h2>Tambah List Detail Item dalam Pos</h2>
@@ -378,6 +506,7 @@
     const rekapMode = document.getElementById("rekapMode");
     const presetWrapper = document.getElementById("presetWrapper");
     const manualNameWrapper = document.getElementById("manualNameWrapper");
+    const manualBudgetName = document.getElementById("manualBudgetName");
     const rekapCategory = document.getElementById("rekapCategory");
     const rekapLimit = document.getElementById("rekapLimit");
     const txBudgetSelect = document.getElementById("txBudgetSelect");
@@ -412,17 +541,18 @@
       } else {
         presetWrapper.classList.add("hidden");
         manualNameWrapper.classList.remove("hidden");
+        manualBudgetName.value = "";
         rekapLimit.value = "";
       }
     });
 
-    // Navigasi Tab
+    // Navigasi 4 Tab
     document.querySelectorAll(".tab-btn").forEach((btn) => {
       btn.addEventListener("click", () => {
         document.querySelectorAll(".tab-btn").forEach((b) => b.classList.remove("active"));
         btn.classList.add("active");
         const target = btn.getAttribute("data-tab");
-        ["tabDashboard", "tabRekap", "tabRincian"].forEach((id) => {
+        ["tabDashboard", "tabCatat", "tabRekap", "tabRincian"].forEach((id) => {
           document.getElementById(id).classList.toggle("hidden", id !== target);
         });
       });
@@ -445,12 +575,13 @@
 
     document.getElementById("logoutBtn").addEventListener("click", () => signOut(auth));
 
-    let unsubIncome = null;
+    let unsubSettings = null;
     let unsubBudgets = null;
     let unsubSubItems = null;
     let unsubTx = null;
 
     let monthlyIncome = DEFAULT_INCOME;
+    let customTotalBudget = null; // null = ikut jumlah pos otomatis
     let budgetsData = [];
     let subItemsData = [];
     let txData = [];
@@ -459,12 +590,12 @@
       if (user) {
         authSection.classList.add("hidden");
         appSection.classList.remove("hidden");
-        userInfo.textContent = `Akun: ${user.email}`;
+        userInfo.textContent = user.email;
         subscribeMonth(monthInput.value);
       } else {
         authSection.classList.remove("hidden");
         appSection.classList.add("hidden");
-        [unsubIncome, unsubBudgets, unsubSubItems, unsubTx].forEach((fn) => fn && fn());
+        [unsubSettings, unsubBudgets, unsubSubItems, unsubTx].forEach((fn) => fn && fn());
       }
     });
 
@@ -473,10 +604,19 @@
     });
 
     function subscribeMonth(month) {
-      [unsubIncome, unsubBudgets, unsubSubItems, unsubTx].forEach((fn) => fn && fn());
+      [unsubSettings, unsubBudgets, unsubSubItems, unsubTx].forEach((fn) => fn && fn());
 
-      unsubIncome = onSnapshot(doc(db, "monthly_incomes", month), (snap) => {
-        monthlyIncome = snap.exists() ? Number(snap.data().amount ?? DEFAULT_INCOME) : DEFAULT_INCOME;
+      unsubSettings = onSnapshot(doc(db, "monthly_settings", month), (snap) => {
+        if (snap.exists()) {
+          const data = snap.data();
+          monthlyIncome = data.income !== undefined ? Number(data.income) : DEFAULT_INCOME;
+          customTotalBudget = data.customTotalBudget !== undefined && data.customTotalBudget !== null
+            ? Number(data.customTotalBudget)
+            : null;
+        } else {
+          monthlyIncome = DEFAULT_INCOME;
+          customTotalBudget = null;
+        }
         renderAll();
       });
 
@@ -509,20 +649,64 @@
       const month = monthInput.value;
       const val = Number(document.getElementById("incomeInput").value || 0);
       try {
-        await setDoc(doc(db, "monthly_incomes", month), {
+        await setDoc(doc(db, "monthly_settings", month), {
           month,
-          amount: val,
+          income: val,
+          customTotalBudget,
           updatedBy: auth.currentUser?.email || "",
           updatedAt: new Date().toISOString()
-        });
+        }, { merge: true });
         document.getElementById("incomeEditRow").classList.add("hidden");
-        statusMsg.textContent = `Gaji/Pemasukan bulan ${month} diperbarui menjadi ${rupiah(val)}.`;
+        statusMsg.textContent = `Gaji/Pemasukan bulan ${month} disimpan (${rupiah(val)}).`;
       } catch (err) {
         statusMsg.textContent = "Gagal simpan gaji: " + err.message;
       }
     });
 
-    // Simpan / Update Pos Anggaran (List Lama atau Manual)
+    // Edit Total Anggaran Manual / Kembali ke Otomatis
+    document.getElementById("toggleBudgetEditBtn").addEventListener("click", () => {
+      const row = document.getElementById("budgetEditRow");
+      row.classList.toggle("hidden");
+      const autoSum = budgetsData.reduce((acc, b) => acc + Number(b.limit || 0), 0);
+      document.getElementById("manualTotalBudgetInput").value = customTotalBudget !== null ? customTotalBudget : autoSum;
+    });
+
+    document.getElementById("saveManualBudgetBtn").addEventListener("click", async () => {
+      const month = monthInput.value;
+      const val = Number(document.getElementById("manualTotalBudgetInput").value || 0);
+      try {
+        await setDoc(doc(db, "monthly_settings", month), {
+          month,
+          income: monthlyIncome,
+          customTotalBudget: val,
+          updatedBy: auth.currentUser?.email || "",
+          updatedAt: new Date().toISOString()
+        }, { merge: true });
+        document.getElementById("budgetEditRow").classList.add("hidden");
+        statusMsg.textContent = `Total Anggaran manual bulan ${month} disimpan (${rupiah(val)}).`;
+      } catch (err) {
+        statusMsg.textContent = "Gagal simpan total anggaran: " + err.message;
+      }
+    });
+
+    document.getElementById("resetAutoBudgetBtn").addEventListener("click", async () => {
+      const month = monthInput.value;
+      try {
+        await setDoc(doc(db, "monthly_settings", month), {
+          month,
+          income: monthlyIncome,
+          customTotalBudget: null,
+          updatedBy: auth.currentUser?.email || "",
+          updatedAt: new Date().toISOString()
+        }, { merge: true });
+        document.getElementById("budgetEditRow").classList.add("hidden");
+        statusMsg.textContent = "Total Anggaran dikembalikan ke hitungan otomatis dari pos.";
+      } catch (err) {
+        statusMsg.textContent = "Gagal reset total anggaran: " + err.message;
+      }
+    });
+
+    // Simpan / Update Pos Anggaran (List Lama + Edit Angka / Manual)
     document.getElementById("rekapForm").addEventListener("submit", async (e) => {
       e.preventDefault();
       const month = monthInput.value;
@@ -531,7 +715,7 @@
         const preset = PREVIOUS_LIST[Number(presetSelect.value || 0)];
         name = preset.name;
       } else {
-        name = document.getElementById("manualBudgetName").value.trim();
+        name = manualBudgetName.value.trim();
       }
       const category = rekapCategory.value;
       const limit = Number(rekapLimit.value || 0);
@@ -548,7 +732,7 @@
           month
         });
         if (rekapMode.value === "manual") {
-          document.getElementById("manualBudgetName").value = "";
+          manualBudgetName.value = "";
           rekapLimit.value = "";
         }
         statusMsg.textContent = `Pos "${name}" (${rupiah(limit)}) tersimpan untuk ${month}.`;
@@ -584,7 +768,7 @@
       }
     });
 
-    // Update pilihan rincian item saat pos dipilih di form transaksi
+    // Sinkronkan dropdown rincian item saat pos berubah
     function populateSubItemDropdown() {
       const selectedBudgetId = txBudgetSelect.value;
       const matching = subItemsData.filter((s) => s.budgetId === selectedBudgetId);
@@ -605,7 +789,7 @@
       const month = date.slice(0, 7) || monthInput.value;
 
       if (!budgetId) {
-        statusMsg.textContent = "Tambahkan pos anggaran terlebih dahulu di menu Rekap Anggaran.";
+        statusMsg.textContent = "Tambahkan pos anggaran terlebih dahulu di tab Rekap.";
         return;
       }
 
@@ -634,14 +818,12 @@
     });
 
     function renderAll() {
-      // Update tampilan gaji
       document.getElementById("incomeValueText").textContent = rupiah(monthlyIncome);
 
-      // Update dropdown pos di form transaksi & rincian item
       const prevBudgetVal = txBudgetSelect.value;
       const budgetOptionsHtml = budgetsData.length
         ? budgetsData.map((b) => `<option value="${b.id}">${b.name} (${rupiah(b.limit)})</option>`).join("")
-        : `<option value="">-- Belum ada pos (isi di tab Rekap Anggaran) --</option>`;
+        : `<option value="">-- Belum ada pos (isi di tab Rekap) --</option>`;
 
       txBudgetSelect.innerHTML = budgetOptionsHtml;
       if (prevBudgetVal && budgetsData.some((b) => b.id === prevBudgetVal)) {
@@ -650,7 +832,7 @@
       document.getElementById("subTargetBudget").innerHTML = budgetOptionsHtml;
       populateSubItemDropdown();
 
-      // Hitung pengeluaran harian, mingguan (7 hari terakhir), dan bulanan
+      // Hitung pengeluaran harian, mingguan, dan bulanan
       const sevenDaysAgo = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 6);
       const sevenDaysStr = `${sevenDaysAgo.getFullYear()}-${pad(sevenDaysAgo.getMonth() + 1)}-${pad(sevenDaysAgo.getDate())}`;
 
@@ -673,12 +855,18 @@
         }
       }
 
-      const totalBudget = budgetsData.reduce((acc, b) => acc + Number(b.limit || 0), 0);
-      const diffVsIncome = monthlyIncome - totalBudget;
+      const autoBudgetSum = budgetsData.reduce((acc, b) => acc + Number(b.limit || 0), 0);
+      const effectiveTotalBudget = customTotalBudget !== null ? customTotalBudget : autoBudgetSum;
+      const diffVsIncome = monthlyIncome - effectiveTotalBudget;
       const remainIncome = monthlyIncome - monthlySpent;
 
       document.getElementById("posCountDisplay").textContent = `${budgetsData.length} Pos`;
-      document.getElementById("totalBudgetDisplay").textContent = rupiah(totalBudget);
+      document.getElementById("totalBudgetDisplay").textContent = rupiah(effectiveTotalBudget);
+      document.getElementById("budgetModeNote").textContent =
+        customTotalBudget !== null
+          ? `Mode manual (Pos: ${rupiah(autoBudgetSum)})`
+          : "Otomatis dari jumlah pos";
+
       document.getElementById("dailySpentDisplay").textContent = rupiah(dailySpent);
       document.getElementById("weeklySpentDisplay").textContent = rupiah(weeklySpent);
       document.getElementById("monthlySpentDisplay").textContent = rupiah(monthlySpent);
@@ -691,7 +879,64 @@
       remEl.textContent = (remainIncome >= 0 ? "" : "-") + rupiah(Math.abs(remainIncome));
       remEl.className = remainIncome >= 0 ? "ok" : "danger";
 
-      // Render Daftar Rekap Pos di Tab Rekap
+      // Grafik Ringkasan (Gaji vs Total Anggaran vs Terpakai)
+      const maxScale = Math.max(monthlyIncome, effectiveTotalBudget, monthlySpent, 1);
+      const pctBudgetVsMax = Math.min(100, Math.round((effectiveTotalBudget / maxScale) * 100));
+      const pctSpentVsMax = Math.min(100, Math.round((monthlySpent / maxScale) * 100));
+      const pctSpentVsIncome = monthlyIncome > 0 ? Math.round((monthlySpent / monthlyIncome) * 100) : 0;
+
+      document.getElementById("overviewChart").innerHTML = `
+        <div class="chart-row">
+          <div class="row-between" style="font-size:0.82rem;">
+            <span><strong>Gaji / Pemasukan</strong></span>
+            <strong>${rupiah(monthlyIncome)} (100%)</strong>
+          </div>
+          <div class="bar-bg"><div class="bar-fill teal" style="width:100%"></div></div>
+        </div>
+        <div class="chart-row">
+          <div class="row-between" style="font-size:0.82rem;">
+            <span><strong>Total Anggaran</strong></span>
+            <strong>${rupiah(effectiveTotalBudget)}</strong>
+          </div>
+          <div class="bar-bg"><div class="bar-fill blue" style="width:${pctBudgetVsMax}%"></div></div>
+        </div>
+        <div class="chart-row">
+          <div class="row-between" style="font-size:0.82rem;">
+            <span><strong>Terpakai Bulan Ini</strong></span>
+            <strong>${rupiah(monthlySpent)} (${pctSpentVsIncome}% gaji)</strong>
+          </div>
+          <div class="bar-bg"><div class="bar-fill ${pctSpentVsIncome > 100 ? "danger" : pctSpentVsIncome >= 80 ? "warn" : ""}" style="width:${pctSpentVsMax}%"></div></div>
+        </div>
+      `;
+
+      // Grafik Pemakaian per Pos
+      const topChartEl = document.getElementById("topBudgetChart");
+      if (!budgetsData.length) {
+        topChartEl.innerHTML = `<p class="muted">Belum ada pos anggaran untuk digrafikkan.</p>`;
+      } else {
+        const sortedBudgets = [...budgetsData]
+          .sort((a, b) => (spentByBudget[b.id] || 0) - (spentByBudget[a.id] || 0))
+          .slice(0, 6);
+
+        topChartEl.innerHTML = sortedBudgets.map((b) => {
+          const spent = spentByBudget[b.id] || 0;
+          const limit = Number(b.limit || 0);
+          const pct = limit > 0 ? Math.min(100, Math.round((spent / limit) * 100)) : (spent > 0 ? 100 : 0);
+          const barClass = spent > limit ? "danger" : pct >= 80 ? "warn" : "";
+          const badgeClass = spent > limit ? "badge-danger" : pct >= 80 ? "badge-warn" : "badge-ok";
+          return `
+            <div class="chart-row">
+              <div class="row-between" style="font-size:0.8rem;">
+                <span><strong>${b.name}</strong></span>
+                <span>${rupiah(spent)} / ${rupiah(limit)} <span class="badge ${badgeClass}">${pct}%</span></span>
+              </div>
+              <div class="bar-bg"><div class="bar-fill ${barClass}" style="width:${pct}%"></div></div>
+            </div>
+          `;
+        }).join("");
+      }
+
+      // Daftar Rekap Pos di Tab Rekap + Edit & Hapus
       const rekapListEl = document.getElementById("rekapList");
       if (!budgetsData.length) {
         rekapListEl.innerHTML = `<p class="muted">Belum ada pos anggaran pada bulan ini.</p>`;
@@ -706,15 +951,33 @@
               <div class="row-between">
                 <div>
                   <strong>${b.name}</strong>
-                  <div class="muted">${b.category} • Anggaran: ${rupiah(limit)}</div>
+                  <div class="muted">${b.category} • Anggaran: <strong>${rupiah(limit)}</strong></div>
                 </div>
-                <button type="button" class="danger-btn small" data-del-budget="${b.docId}">Hapus</button>
+                <div style="display:flex; gap:6px;">
+                  <button type="button" class="secondary small" data-edit-budget="${b.id}">Edit</button>
+                  <button type="button" class="danger-btn small" data-del-budget="${b.docId}">Hapus</button>
+                </div>
               </div>
               <div class="bar-bg"><div class="bar-fill ${barClass}" style="width:${pct}%"></div></div>
               <div class="muted" style="margin-top:4px;">Terpakai: ${rupiah(spent)} | Sisa pos: ${rupiah(limit - spent)}</div>
             </div>
           `;
         }).join("");
+
+        rekapListEl.querySelectorAll("[data-edit-budget]").forEach((btn) => {
+          btn.addEventListener("click", () => {
+            const target = budgetsData.find((item) => item.id === btn.getAttribute("data-edit-budget"));
+            if (!target) return;
+            rekapMode.value = "manual";
+            presetWrapper.classList.add("hidden");
+            manualNameWrapper.classList.remove("hidden");
+            manualBudgetName.value = target.name;
+            rekapCategory.value = target.category || "Lainnya";
+            rekapLimit.value = target.limit;
+            statusMsg.textContent = `Mengedit pos "${target.name}". Ubah nominal lalu klik Simpan / Update.`;
+            window.scrollTo({ top: 0, behavior: "smooth" });
+          });
+        });
 
         rekapListEl.querySelectorAll("[data-del-budget]").forEach((btn) => {
           btn.addEventListener("click", async () => {
@@ -723,7 +986,7 @@
         });
       }
 
-      // Render Breakdown Pos + Rincian Item di Tab Rincian Item
+      // Breakdown Pos + Rincian Item di Tab Item
       const detailEl = document.getElementById("detailBreakdownList");
       if (!budgetsData.length) {
         detailEl.innerHTML = `<p class="muted">Tambahkan pos anggaran terlebih dahulu.</p>`;
@@ -765,7 +1028,7 @@
         });
       }
 
-      // Render Riwayat Transaksi
+      // Riwayat Transaksi di Tab Catat
       const txListEl = document.getElementById("txList");
       if (!txData.length) {
         txListEl.innerHTML = `<p class="muted">Belum ada transaksi tercatat di bulan ini.</p>`;
