@@ -275,10 +275,10 @@
             <button type="button" id="toggleIncomeEditBtn" class="secondary small">Edit Gaji</button>
           </div>
           <div id="incomeValueText" style="font-size:1.1rem; font-weight:800; margin-top:4px; color:var(--primary-dark);">
-            Rp7.000.000
+            Rp0
           </div>
           <div id="incomeEditRow" class="inline-edit hidden">
-            <input type="number" id="incomeInput" min="0" step="1000" placeholder="7000000" />
+            <input type="number" id="incomeInput" min="0" step="1000" placeholder="Contoh: 7000000" />
             <button type="button" id="saveIncomeBtn" class="small">Simpan</button>
           </div>
         </div>
@@ -315,11 +315,10 @@
           </div>
 
           <div id="budgetEditRow" class="sub-box hidden">
-            <label for="manualTotalBudgetInput" style="margin-top:0;">Atur Total Anggaran Bulan Ini (Rp)</label>
+            <label for="manualTotalBudgetInput" style="margin-top:0;">Input Manual Total Anggaran Bulan Ini (Rp)</label>
             <div class="inline-edit">
-              <input type="number" id="manualTotalBudgetInput" min="0" step="1000" placeholder="Contoh: 6625000" />
+              <input type="number" id="manualTotalBudgetInput" min="0" step="1000" placeholder="Ketik nominal total anggaran" />
               <button type="button" id="saveManualBudgetBtn" class="small">Simpan</button>
-              <button type="button" id="resetAutoBudgetBtn" class="secondary small">Ikut Pos</button>
             </div>
           </div>
 
@@ -490,14 +489,13 @@
     const auth = getAuth(app);
     const db = getFirestore(app);
 
-    const DEFAULT_INCOME = 7000000;
     const PREVIOUS_LIST = [
-      { name: "Angsuran BRI", category: "Cicilan & Utang", limit: 2000000 },
+      { name: "Angsuran BRI", category: "Cicilan & Utang", limit: 1981000 },
       { name: "Listrik", category: "Utilitas & Rumah", limit: 130000 },
       { name: "PDAM", category: "Utilitas & Rumah", limit: 140000 },
       { name: "WiFi", category: "Utilitas & Rumah", limit: 150000 },
-      { name: "Arisan papa", category: "Hiburan & Arisan", limit: 250000 },
-      { name: "Arisan mama", category: "Hiburan & Arisan", limit: 250000 },
+      { name: "Arisan Kantor", category: "Hiburan & Arisan", limit: 250000 },
+      { name: "Arisan Kampung", category: "Hiburan & Arisan", limit: 250000 },
       { name: "Belanja bulanan", category: "Makan, Belanja & Jajan", limit: 500000 },
       { name: "Skincare", category: "Anak & Perawatan Diri", limit: 200000 },
       { name: "Day care anak", category: "Anak & Perawatan Diri", limit: 70000 },
@@ -507,15 +505,14 @@
       { name: "Susu anak", category: "Anak & Perawatan Diri", limit: 100000 },
       { name: "Hiburan atau jalan-jalan", category: "Hiburan & Arisan", limit: 400000 },
       { name: "Jajan anak sekolah", category: "Makan, Belanja & Jajan", limit: 300000 },
-      { name: "Jajan anak di rumah", category: "Makan, Belanja & Jajan", limit: 150000 },
       { name: "Uang harian mamah", category: "Makan, Belanja & Jajan", limit: 800000 },
       { name: "Uang ikan dan sayur", category: "Makan, Belanja & Jajan", limit: 400000 },
       { name: "Uang jajan papah", category: "Makan, Belanja & Jajan", limit: 200000 },
-      { name: "Tabungan anak", category: "Tabungan & Cadangan", limit: 50000 },
       { name: "Beras", category: "Makan, Belanja & Jajan", limit: 225000 },
       { name: "Paket", category: "Utilitas & Rumah", limit: 50000 },
       { name: "Service kendaraan", category: "Transportasi & Kendaraan", limit: 160000 },
       { name: "Parkir kendaraan", category: "Transportasi & Kendaraan", limit: 50000 }
+      { name: "Tabungan", category: "Tabungan & Cadangan", limit: 50000 },
     ];
 
     const rupiah = (n) => "Rp" + Number(n || 0).toLocaleString("id-ID");
@@ -686,8 +683,8 @@
     let unsubSubItems = null;
     let unsubTx = null;
 
-    let monthlyIncome = DEFAULT_INCOME;
-    let customTotalBudget = null;
+    let monthlyIncome = 0;
+    let manualTotalBudget = 0;
     let budgetsData = [];
     let subItemsData = [];
     let txData = [];
@@ -709,17 +706,23 @@
     function subscribeMonth(month) {
       [unsubSettings, unsubBudgets, unsubSubItems, unsubTx].forEach((fn) => fn && fn());
       lastAutoFilledBudgetId = "";
+      monthlyIncome = 0;
+      manualTotalBudget = 0;
+      budgetsData = [];
+      subItemsData = [];
+      txData = [];
+      renderAll();
 
       unsubSettings = onSnapshot(doc(db, "monthly_settings", month), (snap) => {
         if (snap.exists()) {
           const data = snap.data();
-          monthlyIncome = data.income !== undefined ? Number(data.income) : DEFAULT_INCOME;
-          customTotalBudget = data.customTotalBudget !== undefined && data.customTotalBudget !== null
-            ? Number(data.customTotalBudget)
-            : null;
+          monthlyIncome = data.income !== undefined ? Number(data.income) : 0;
+          manualTotalBudget = data.manualTotalBudget !== undefined
+            ? Number(data.manualTotalBudget)
+            : (data.customTotalBudget !== undefined && data.customTotalBudget !== null ? Number(data.customTotalBudget) : 0);
         } else {
-          monthlyIncome = DEFAULT_INCOME;
-          customTotalBudget = null;
+          monthlyIncome = 0;
+          manualTotalBudget = 0;
         }
         renderAll();
       });
@@ -755,7 +758,7 @@
         await setDoc(doc(db, "monthly_settings", month), {
           month,
           income: val,
-          customTotalBudget,
+          manualTotalBudget,
           updatedBy: auth.currentUser?.email || "",
           updatedAt: new Date().toISOString()
         }, { merge: true });
@@ -769,8 +772,7 @@
     document.getElementById("toggleBudgetEditBtn").addEventListener("click", () => {
       const row = document.getElementById("budgetEditRow");
       row.classList.toggle("hidden");
-      const autoSum = budgetsData.reduce((acc, b) => acc + Number(b.limit || 0), 0);
-      document.getElementById("manualTotalBudgetInput").value = customTotalBudget !== null ? customTotalBudget : autoSum;
+      document.getElementById("manualTotalBudgetInput").value = manualTotalBudget;
     });
 
     document.getElementById("saveManualBudgetBtn").addEventListener("click", async () => {
@@ -780,7 +782,7 @@
         await setDoc(doc(db, "monthly_settings", month), {
           month,
           income: monthlyIncome,
-          customTotalBudget: val,
+          manualTotalBudget: val,
           updatedBy: auth.currentUser?.email || "",
           updatedAt: new Date().toISOString()
         }, { merge: true });
@@ -791,24 +793,6 @@
       }
     });
 
-    document.getElementById("resetAutoBudgetBtn").addEventListener("click", async () => {
-      const month = getSelectedMonth();
-      try {
-        await setDoc(doc(db, "monthly_settings", month), {
-          month,
-          income: monthlyIncome,
-          customTotalBudget: null,
-          updatedBy: auth.currentUser?.email || "",
-          updatedAt: new Date().toISOString()
-        }, { merge: true });
-        document.getElementById("budgetEditRow").classList.add("hidden");
-        statusMsg.textContent = "Total Anggaran dikembalikan ke hitungan otomatis dari pos.";
-      } catch (err) {
-        statusMsg.textContent = "Gagal reset total anggaran: " + err.message;
-      }
-    });
-
-    // Simpan / Update Pos Anggaran (dan hapus dokumen lama jika nama di-rename saat edit)
     document.getElementById("rekapForm").addEventListener("submit", async (e) => {
       e.preventDefault();
       const month = getSelectedMonth();
@@ -994,8 +978,7 @@
         }
       }
 
-      const autoBudgetSum = budgetsData.reduce((acc, b) => acc + Number(b.limit || 0), 0);
-      const effectiveTotalBudget = customTotalBudget !== null ? customTotalBudget : autoBudgetSum;
+      const effectiveTotalBudget = Number(manualTotalBudget || 0);
       const diffVsIncome = monthlyIncome - effectiveTotalBudget;
       const remainIncome = monthlyIncome - monthlySpent;
 
