@@ -98,15 +98,15 @@
       border-radius: 11px;
       border: 1px solid #cbd5e1;
       font-size: 0.92rem;
-      background: #fff;
-      color: var(--text);
+      background: #ffffff;
+      color: #0f172a;
+      color-scheme: light;
     }
     input[type="month"] {
       background: #ccfbf1;
-      color: #115e59;
+      color: #0f172a;
       border: 1.5px solid #0d9488;
       font-weight: 700;
-      color-scheme: light;
     }
     input:focus, select:focus { outline: 2px solid rgba(13, 148, 136, 0.25); border-color: var(--primary); }
 
@@ -121,10 +121,13 @@
     }
     button:active { transform: scale(0.99); }
     button:hover { background: var(--primary-dark); }
-    button.secondary { background: #e2e8f0; color: var(--text); }
+    button.secondary { background: #e2e8f0; color: #0f172a; }
     button.secondary:hover { background: #cbd5e1; }
     button.danger-btn { background: var(--danger-soft); color: var(--danger); }
     button.small { width: auto; padding: 6px 10px; font-size: 0.78rem; margin-top: 0; border-radius: 9px; }
+
+    .quick-months { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-top: 8px; }
+    .quick-months button { margin-top: 0; padding: 7px 8px; font-size: 0.76rem; }
 
     .nav-tabs {
       display: grid;
@@ -237,6 +240,11 @@
           <span id="monthBadge" class="badge badge-ok">Aktif</span>
         </div>
         <input type="month" id="monthInput" />
+        <div class="quick-months">
+          <button type="button" id="prevMonthBtn" class="secondary">Bulan Lalu</button>
+          <button type="button" id="currMonthBtn" class="secondary">Bulan Ini</button>
+          <button type="button" id="nextMonthBtn" class="secondary">Bulan Depan</button>
+        </div>
 
         <!-- GAJI / PEMASUKAN BISA DIEDIT -->
         <div class="sub-box">
@@ -342,7 +350,7 @@
               <option value="">-- Umum / Tanpa Rincian Item --</option>
             </select>
 
-            <label for="txAmount">Nominal Pengeluaran (Rp)</label>
+            <label for="txAmount">Nominal Pengeluaran (Rp — Otomatis Sesuai Pos, Bisa Diubah)</label>
             <input type="number" id="txAmount" min="1" step="1" required placeholder="Contoh: 35000" />
 
             <label for="txDate">Tanggal</label>
@@ -499,6 +507,14 @@
     const currentMonth = `${now.getFullYear()}-${pad(now.getMonth() + 1)}`;
     const todayStr = `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`;
 
+    function shiftMonth(ymStr, deltaMonths) {
+      const parts = (ymStr || currentMonth).split("-");
+      const y = Number(parts[0]) || now.getFullYear();
+      const m = (Number(parts[1]) || (now.getMonth() + 1)) - 1 + deltaMonths;
+      const d = new Date(y, m, 1);
+      return `${d.getFullYear()}-${pad(d.getMonth() + 1)}`;
+    }
+
     const authSection = document.getElementById("authSection");
     const appSection = document.getElementById("appSection");
     const userInfo = document.getElementById("userInfo");
@@ -514,9 +530,29 @@
     const rekapLimit = document.getElementById("rekapLimit");
     const txBudgetSelect = document.getElementById("txBudgetSelect");
     const txSubItemSelect = document.getElementById("txSubItemSelect");
+    const txAmountInput = document.getElementById("txAmount");
 
     monthInput.value = currentMonth;
     txDateInput.value = todayStr;
+
+    function handleMonthChange() {
+      if (!monthInput.value) monthInput.value = currentMonth;
+      if (auth.currentUser) subscribeMonth(monthInput.value);
+    }
+
+    monthInput.addEventListener("change", handleMonthChange);
+    document.getElementById("prevMonthBtn").addEventListener("click", () => {
+      monthInput.value = shiftMonth(monthInput.value, -1);
+      handleMonthChange();
+    });
+    document.getElementById("currMonthBtn").addEventListener("click", () => {
+      monthInput.value = currentMonth;
+      handleMonthChange();
+    });
+    document.getElementById("nextMonthBtn").addEventListener("click", () => {
+      monthInput.value = shiftMonth(monthInput.value, 1);
+      handleMonthChange();
+    });
 
     // Isi dropdown list lama tanpa nominal/Rp
     presetSelect.innerHTML = PREVIOUS_LIST.map((item, idx) =>
@@ -588,6 +624,7 @@
     let budgetsData = [];
     let subItemsData = [];
     let txData = [];
+    let lastAutoFilledBudgetId = "";
 
     onAuthStateChanged(auth, (user) => {
       if (user) {
@@ -602,12 +639,9 @@
       }
     });
 
-    monthInput.addEventListener("change", () => {
-      if (auth.currentUser) subscribeMonth(monthInput.value);
-    });
-
     function subscribeMonth(month) {
       [unsubSettings, unsubBudgets, unsubSubItems, unsubTx].forEach((fn) => fn && fn());
+      lastAutoFilledBudgetId = "";
 
       unsubSettings = onSnapshot(doc(db, "monthly_settings", month), (snap) => {
         if (snap.exists()) {
@@ -771,6 +805,29 @@
       }
     });
 
+    // Isi otomatis nominal sesuai anggaran pos / item (tetap bisa diubah manual)
+    function applySuggestedAmount(forceFill = false) {
+      const selectedBudgetId = txBudgetSelect.value;
+      const selectedSubId = txSubItemSelect.value;
+      if (!selectedBudgetId) {
+        if (forceFill) txAmountInput.value = "";
+        return;
+      }
+
+      if (selectedSubId) {
+        const subObj = subItemsData.find((s) => s.budgetId === selectedBudgetId && s.id === selectedSubId);
+        if (subObj && (forceFill || txAmountInput.value === "")) {
+          txAmountInput.value = Number(subObj.limit || 0);
+        }
+        return;
+      }
+
+      const budgetObj = budgetsData.find((b) => b.id === selectedBudgetId);
+      if (budgetObj && (forceFill || txAmountInput.value === "")) {
+        txAmountInput.value = Number(budgetObj.limit || 0);
+      }
+    }
+
     function populateSubItemDropdown() {
       const selectedBudgetId = txBudgetSelect.value;
       const matching = subItemsData.filter((s) => s.budgetId === selectedBudgetId);
@@ -778,14 +835,23 @@
         `<option value="">-- Umum / Tanpa Rincian Item --</option>` +
         matching.map((s) => `<option value="${s.id}">${s.name} (Anggaran: ${rupiah(s.limit)})</option>`).join("");
     }
-    txBudgetSelect.addEventListener("change", populateSubItemDropdown);
+
+    txBudgetSelect.addEventListener("change", () => {
+      populateSubItemDropdown();
+      applySuggestedAmount(true);
+      lastAutoFilledBudgetId = txBudgetSelect.value;
+    });
+
+    txSubItemSelect.addEventListener("change", () => {
+      applySuggestedAmount(true);
+    });
 
     // Simpan Pengeluaran
     document.getElementById("txForm").addEventListener("submit", async (e) => {
       e.preventDefault();
       const budgetId = txBudgetSelect.value;
       const subItemId = txSubItemSelect.value || "";
-      const amount = Number(document.getElementById("txAmount").value);
+      const amount = Number(txAmountInput.value);
       const date = txDateInput.value;
       const note = document.getElementById("txNote").value.trim();
       const month = date.slice(0, 7) || monthInput.value;
@@ -811,8 +877,8 @@
           createdBy: auth.currentUser?.email || "",
           createdAt: new Date().toISOString()
         });
-        document.getElementById("txAmount").value = "";
         document.getElementById("txNote").value = "";
+        applySuggestedAmount(true);
         statusMsg.textContent = "Pengeluaran berhasil dicatat.";
       } catch (err) {
         statusMsg.textContent = "Gagal simpan pengeluaran: " + err.message;
@@ -833,6 +899,14 @@
       }
       document.getElementById("subTargetBudget").innerHTML = budgetOptionsHtml;
       populateSubItemDropdown();
+
+      if (txBudgetSelect.value && txBudgetSelect.value !== lastAutoFilledBudgetId) {
+        applySuggestedAmount(true);
+        lastAutoFilledBudgetId = txBudgetSelect.value;
+      } else if (!txBudgetSelect.value) {
+        lastAutoFilledBudgetId = "";
+        txAmountInput.value = "";
+      }
 
       const sevenDaysAgo = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 6);
       const sevenDaysStr = `${sevenDaysAgo.getFullYear()}-${pad(sevenDaysAgo.getMonth() + 1)}-${pad(sevenDaysAgo.getDate())}`;
