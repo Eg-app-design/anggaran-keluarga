@@ -1,7 +1,7 @@
 {
   "name": "Anggaran Keluarga",
   "short_name": "Anggaran",
-  "description": "Aplikasi pencatatan anggaran bulanan dan pengeluaran keluarga.",
+  "description": "Aplikasi akuntansi anggaran bulanan dan pengeluaran keluarga.",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
