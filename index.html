@@ -125,6 +125,7 @@
     button.secondary { background: #e2e8f0; color: #0f172a; }
     button.secondary:hover { background: #cbd5e1; }
     button.danger-btn { background: var(--danger-soft); color: var(--danger); }
+    button.danger-btn:hover { background: #fecaca; }
     button.small { width: auto; padding: 6px 10px; font-size: 0.78rem; margin-top: 0; border-radius: 9px; }
 
     .quick-months { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-top: 8px; }
@@ -177,8 +178,32 @@
       padding: 10px 12px;
       margin-top: 10px;
     }
+    .confirm-box {
+      background: var(--danger-soft);
+      border: 1px solid #fca5a5;
+      border-radius: 12px;
+      padding: 10px 12px;
+      margin-top: 8px;
+    }
     .inline-edit { display: flex; gap: 6px; margin-top: 8px; align-items: center; }
     .inline-edit input { margin-top: 0; flex: 1; }
+
+    .month-range-box {
+      background: var(--soft);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 12px;
+      margin-top: 8px;
+    }
+    .month-breakdown-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 7px 0;
+      border-top: 1px solid var(--border);
+      font-size: 0.82rem;
+    }
+    .month-breakdown-item:first-child { border-top: none; }
 
     .budget-item { border-top: 1px solid var(--border); padding: 11px 0; }
     .budget-item:first-child { border-top: none; }
@@ -268,11 +293,14 @@
           <button type="button" id="nextMonthBtn" class="secondary">Bulan Depan</button>
         </div>
 
-        <!-- GAJI / PEMASUKAN BISA DIEDIT -->
+        <!-- GAJI / PEMASUKAN BISA DIEDIT & DI-CLEAR -->
         <div class="sub-box">
           <div class="row-between">
             <span style="font-size:0.82rem; font-weight:700;">Gaji / Pemasukan Bulan Ini</span>
-            <button type="button" id="toggleIncomeEditBtn" class="secondary small">Edit Gaji</button>
+            <div style="display:flex; gap:6px;">
+              <button type="button" id="toggleIncomeEditBtn" class="secondary small">Edit Gaji</button>
+              <button type="button" id="clearIncomeBtn" class="danger-btn small">Clear</button>
+            </div>
           </div>
           <div id="incomeValueText" style="font-size:1.1rem; font-weight:800; margin-top:4px; color:var(--primary-dark);">
             Rp0
@@ -280,6 +308,15 @@
           <div id="incomeEditRow" class="inline-edit hidden">
             <input type="number" id="incomeInput" min="0" step="1000" placeholder="Contoh: 7000000" />
             <button type="button" id="saveIncomeBtn" class="small">Simpan</button>
+          </div>
+          <div id="clearIncomeConfirmBox" class="confirm-box hidden">
+            <div style="font-size:0.84rem; font-weight:700; color:var(--danger);">
+              apakah anda ingin menghapus Data Gaji ?
+            </div>
+            <div style="display:flex; gap:8px; margin-top:8px;">
+              <button type="button" id="confirmClearIncomeYesBtn" class="danger-btn small">Ya</button>
+              <button type="button" id="confirmClearIncomeNoBtn" class="secondary small">Tidak</button>
+            </div>
           </div>
         </div>
 
@@ -340,6 +377,47 @@
           <div style="margin-top:10px; font-size:0.84rem; line-height:1.55;">
             <div>Selisih Anggaran vs Gaji: <strong id="diffIncomeDisplay"></strong></div>
             <div>Sisa Saldo Gaji vs Terpakai: <strong id="remainIncomeDisplay"></strong></div>
+          </div>
+        </div>
+
+        <!-- FILTER PENGELUARAN BEBERAPA BULAN -->
+        <div class="card">
+          <div class="row-between">
+            <h2 style="margin-bottom:0;">Filter Total Pengeluaran Beberapa Bulan</h2>
+            <span id="rangeCountBadge" class="badge badge-ok">0 Bulan</span>
+          </div>
+          <p class="muted" style="margin-top:4px;">Pilih rentang bulan untuk mengetahui total keuangan yang sudah dikeluarkan dalam beberapa bulan.</p>
+
+          <div class="month-range-box">
+            <div class="grid-2" style="margin-top:0;">
+              <div>
+                <label for="rangeStartMonth" style="margin-top:0;">Dari Bulan</label>
+                <input type="month" id="rangeStartMonth" />
+              </div>
+              <div>
+                <label for="rangeEndMonth" style="margin-top:0;">Sampai Bulan</label>
+                <input type="month" id="rangeEndMonth" />
+              </div>
+            </div>
+
+            <div class="quick-months">
+              <button type="button" id="last3MonthsBtn" class="secondary">3 Bulan Terakhir</button>
+              <button type="button" id="last6MonthsBtn" class="secondary">6 Bulan Terakhir</button>
+              <button type="button" id="syncActiveMonthBtn" class="secondary">Bulan Aktif Saja</button>
+            </div>
+
+            <div class="grid-2" style="margin-top:10px;">
+              <div class="stat-box">
+                <div class="stat-label">Total Pengeluaran Rentang Bulan</div>
+                <div id="rangeTotalSpentDisplay" class="stat-val danger">Rp0</div>
+              </div>
+              <div class="stat-box">
+                <div class="stat-label">Rata-Rata per Bulan</div>
+                <div id="rangeAvgSpentDisplay" class="stat-val">Rp0</div>
+              </div>
+            </div>
+
+            <div id="rangeBreakdownList" style="margin-top:10px;"></div>
           </div>
         </div>
 
@@ -489,7 +567,7 @@
     const auth = getAuth(app);
     const db = getFirestore(app);
 
-    const PREVIOUS_LIST = [
+     const PREVIOUS_LIST = [
       { name: "Angsuran BRI", category: "Cicilan & Utang", limit: 1981000 },
       { name: "Listrik", category: "Utilitas & Rumah", limit: 130000 },
       { name: "PDAM", category: "Utilitas & Rumah", limit: 140000 },
@@ -514,7 +592,27 @@
       { name: "Tabungan", category: "Tabungan & Cadangan", limit: 50000 },
     ];
 
+    const MONTH_NAMES_ID = {
+      "01": "Januari",
+      "02": "Februari",
+      "03": "Maret",
+      "04": "April",
+      "05": "Mei",
+      "06": "Juni",
+      "07": "Juli",
+      "08": "Agustus",
+      "09": "September",
+      "10": "Oktober",
+      "11": "November",
+      "12": "Desember"
+    };
+
     const rupiah = (n) => "Rp" + Number(n || 0).toLocaleString("id-ID");
+    const formatMonthLabel = (ym) => {
+      if (!ym || !ym.includes("-")) return ym || "";
+      const [y, m] = ym.split("-");
+      return `${MONTH_NAMES_ID[m] || m} ${y}`;
+    };
     const slugify = (str) =>
       String(str || "")
         .toLowerCase()
@@ -535,6 +633,26 @@
       return `${d.getFullYear()}-${pad(d.getMonth() + 1)}`;
     }
 
+    function listMonthsInRange(startYm, endYm) {
+      if (!startYm || !endYm) return [];
+      let a = startYm;
+      let b = endYm;
+      if (a > b) {
+        const tmp = a;
+        a = b;
+        b = tmp;
+      }
+      const result = [];
+      let cursor = a;
+      let guard = 0;
+      while (cursor <= b && guard < 60) {
+        result.push(cursor);
+        cursor = shiftMonth(cursor, 1);
+        guard += 1;
+      }
+      return result;
+    }
+
     const authSection = document.getElementById("authSection");
     const appSection = document.getElementById("appSection");
     const userInfo = document.getElementById("userInfo");
@@ -553,6 +671,9 @@
     const txBudgetSelect = document.getElementById("txBudgetSelect");
     const txSubItemSelect = document.getElementById("txSubItemSelect");
     const txAmountInput = document.getElementById("txAmount");
+
+    const rangeStartMonthInput = document.getElementById("rangeStartMonth");
+    const rangeEndMonthInput = document.getElementById("rangeEndMonth");
 
     let editingBudgetDocId = null;
 
@@ -596,10 +717,13 @@
 
     setSelectedMonth(currentMonth);
     txDateInput.value = todayStr;
+    rangeStartMonthInput.value = shiftMonth(currentMonth, -2);
+    rangeEndMonthInput.value = currentMonth;
 
     function handleMonthChange() {
       editingBudgetDocId = null;
       cancelEditBudgetBtn.classList.add("hidden");
+      document.getElementById("clearIncomeConfirmBox").classList.add("hidden");
       if (auth.currentUser) subscribeMonth(getSelectedMonth());
     }
 
@@ -617,6 +741,31 @@
       setSelectedMonth(shiftMonth(getSelectedMonth(), 1));
       handleMonthChange();
     });
+
+    // Preset filter beberapa bulan
+    document.getElementById("last3MonthsBtn").addEventListener("click", () => {
+      const endM = getSelectedMonth();
+      rangeStartMonthInput.value = shiftMonth(endM, -2);
+      rangeEndMonthInput.value = endM;
+      renderRangeSummary();
+    });
+
+    document.getElementById("last6MonthsBtn").addEventListener("click", () => {
+      const endM = getSelectedMonth();
+      rangeStartMonthInput.value = shiftMonth(endM, -5);
+      rangeEndMonthInput.value = endM;
+      renderRangeSummary();
+    });
+
+    document.getElementById("syncActiveMonthBtn").addEventListener("click", () => {
+      const activeM = getSelectedMonth();
+      rangeStartMonthInput.value = activeM;
+      rangeEndMonthInput.value = activeM;
+      renderRangeSummary();
+    });
+
+    rangeStartMonthInput.addEventListener("change", renderRangeSummary);
+    rangeEndMonthInput.addEventListener("change", renderRangeSummary);
 
     presetSelect.innerHTML = PREVIOUS_LIST.map((item, idx) =>
       `<option value="${idx}">${item.name}</option>`
@@ -681,12 +830,14 @@
     let unsubBudgets = null;
     let unsubSubItems = null;
     let unsubTx = null;
+    let unsubAllTx = null;
 
     let monthlyIncome = 0;
     let manualTotalBudget = 0;
     let budgetsData = [];
     let subItemsData = [];
     let txData = [];
+    let allTxData = [];
     let lastAutoFilledBudgetId = "";
 
     onAuthStateChanged(auth, (user) => {
@@ -694,13 +845,22 @@
         authSection.classList.add("hidden");
         appSection.classList.remove("hidden");
         userInfo.textContent = user.email;
+        subscribeAllTransactions();
         subscribeMonth(getSelectedMonth());
       } else {
         authSection.classList.remove("hidden");
         appSection.classList.add("hidden");
-        [unsubSettings, unsubBudgets, unsubSubItems, unsubTx].forEach((fn) => fn && fn());
+        [unsubSettings, unsubBudgets, unsubSubItems, unsubTx, unsubAllTx].forEach((fn) => fn && fn());
       }
     });
+
+    function subscribeAllTransactions() {
+      if (unsubAllTx) unsubAllTx();
+      unsubAllTx = onSnapshot(collection(db, "transactions"), (snap) => {
+        allTxData = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+        renderRangeSummary();
+      });
+    }
 
     function subscribeMonth(month) {
       [unsubSettings, unsubBudgets, unsubSubItems, unsubTx].forEach((fn) => fn && fn());
@@ -744,7 +904,9 @@
       });
     }
 
+    // Edit & Clear Gaji / Pemasukan
     document.getElementById("toggleIncomeEditBtn").addEventListener("click", () => {
+      document.getElementById("clearIncomeConfirmBox").classList.add("hidden");
       const row = document.getElementById("incomeEditRow");
       row.classList.toggle("hidden");
       document.getElementById("incomeInput").value = monthlyIncome;
@@ -765,6 +927,34 @@
         statusMsg.textContent = `Gaji/Pemasukan bulan ${month} disimpan (${rupiah(val)}).`;
       } catch (err) {
         statusMsg.textContent = "Gagal simpan gaji: " + err.message;
+      }
+    });
+
+    document.getElementById("clearIncomeBtn").addEventListener("click", () => {
+      document.getElementById("incomeEditRow").classList.add("hidden");
+      document.getElementById("clearIncomeConfirmBox").classList.toggle("hidden");
+    });
+
+    document.getElementById("confirmClearIncomeNoBtn").addEventListener("click", () => {
+      document.getElementById("clearIncomeConfirmBox").classList.add("hidden");
+    });
+
+    document.getElementById("confirmClearIncomeYesBtn").addEventListener("click", async () => {
+      const month = getSelectedMonth();
+      try {
+        await setDoc(doc(db, "monthly_settings", month), {
+          month,
+          income: 0,
+          manualTotalBudget,
+          updatedBy: auth.currentUser?.email || "",
+          updatedAt: new Date().toISOString()
+        }, { merge: true });
+        document.getElementById("incomeInput").value = "";
+        document.getElementById("incomeEditRow").classList.add("hidden");
+        document.getElementById("clearIncomeConfirmBox").classList.add("hidden");
+        statusMsg.textContent = `Data Gaji bulan ${month} berhasil dihapus (Rp0).`;
+      } catch (err) {
+        statusMsg.textContent = "Gagal menghapus Data Gaji: " + err.message;
       }
     });
 
@@ -931,6 +1121,54 @@
         statusMsg.textContent = "Gagal simpan pengeluaran: " + err.message;
       }
     });
+
+    function renderRangeSummary() {
+      const startYm = rangeStartMonthInput.value;
+      const endYm = rangeEndMonthInput.value;
+      const monthsList = listMonthsInRange(startYm, endYm);
+
+      document.getElementById("rangeCountBadge").textContent = `${monthsList.length} Bulan`;
+
+      if (!monthsList.length) {
+        document.getElementById("rangeTotalSpentDisplay").textContent = rupiah(0);
+        document.getElementById("rangeAvgSpentDisplay").textContent = rupiah(0);
+        document.getElementById("rangeBreakdownList").innerHTML = `<p class="muted">Pilih bulan awal dan akhir terlebih dahulu.</p>`;
+        return;
+      }
+
+      const monthSet = new Set(monthsList);
+      const perMonthTotals = {};
+      const perMonthCounts = {};
+      for (const m of monthsList) {
+        perMonthTotals[m] = 0;
+        perMonthCounts[m] = 0;
+      }
+
+      let grandTotal = 0;
+      for (const tx of allTxData) {
+        const txMonth = tx.month || (tx.date ? tx.date.slice(0, 7) : "");
+        if (monthSet.has(txMonth)) {
+          const amt = Number(tx.amount || 0);
+          grandTotal += amt;
+          perMonthTotals[txMonth] = (perMonthTotals[txMonth] || 0) + amt;
+          perMonthCounts[txMonth] = (perMonthCounts[txMonth] || 0) + 1;
+        }
+      }
+
+      const avgSpent = Math.round(grandTotal / monthsList.length);
+      document.getElementById("rangeTotalSpentDisplay").textContent = rupiah(grandTotal);
+      document.getElementById("rangeAvgSpentDisplay").textContent = rupiah(avgSpent);
+
+      document.getElementById("rangeBreakdownList").innerHTML = monthsList.map((m) => `
+        <div class="month-breakdown-item">
+          <div>
+            <strong>${formatMonthLabel(m)}</strong>
+            <span class="muted">(${perMonthCounts[m] || 0} transaksi)</span>
+          </div>
+          <strong>${rupiah(perMonthTotals[m] || 0)}</strong>
+        </div>
+      `).join("");
+    }
 
     function renderAll() {
       document.getElementById("incomeValueText").textContent = rupiah(monthlyIncome);
@@ -1174,6 +1412,8 @@
           });
         });
       }
+
+      renderRangeSummary();
     }
   </script>
 </body>
