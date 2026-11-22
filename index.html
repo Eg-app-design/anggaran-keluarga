@@ -202,12 +202,27 @@
       flex-shrink: 0;
     }
 
-    .chevron-ico {
-      width: 18px;
-      height: 18px;
-      color: #67e8f9;
-      transition: transform 0.25s ease;
-      flex-shrink: 0;
+    .collapse-bar {
+      width: 100%;
+      margin-top: 0;
+      padding: 10px 12px;
+      border-radius: 12px;
+      background: rgba(15, 23, 42, 0.92);
+      border: 1px solid rgba(250, 204, 21, 0.35);
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      text-transform: none;
+      letter-spacing: 0.2px;
+      box-shadow: none;
+    }
+
+    .collapse-bar:hover {
+      background: rgba(30, 41, 59, 0.95);
+      border-color: rgba(250, 204, 21, 0.7);
+      box-shadow: 0 0 12px rgba(250, 204, 21, 0.18);
     }
 
     .chevron-ico.collapsed {
