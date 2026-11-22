@@ -3,55 +3,99 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="theme-color" content="#0d9488" />
+  <meta name="theme-color" content="#020617" />
   <title>Anggaran Keluarga</title>
   <link rel="manifest" href="manifest.json" />
   <style>
     :root {
       --primary: #0d9488;
       --primary-dark: #0f766e;
-      --primary-soft: #ccfbf1;
-      --accent: #2563eb;
-      --bg: #eef3f2;
-      --card: #ffffff;
-      --text: #0f172a;
-      --muted: #64748b;
-      --danger: #dc2626;
-      --danger-soft: #fee2e2;
-      --warn: #d97706;
-      --warn-soft: #fef3c7;
-      --ok: #16a34a;
-      --ok-soft: #dcfce7;
-      --border: #e2e8f0;
-      --soft: #f8fafc;
+      --primary-soft: #0f172a;
+      --accent: #06b6d4;
+      --accent-blue: #38bdf8;
+      --bg: #020617;
+      --card: rgba(15, 23, 42, 0.78);
+      --text: #f1f5f9;
+      --muted: #94a3b8;
+      --danger: #ef4444;
+      --danger-soft: rgba(239, 68, 68, 0.16);
+      --warn: #f59e0b;
+      --warn-soft: rgba(245, 158, 11, 0.16);
+      --ok: #22c55e;
+      --ok-soft: rgba(34, 197, 94, 0.16);
+      --border: #1e293b;
+      --soft: rgba(30, 41, 59, 0.65);
     }
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
-    body { background: var(--bg); color: var(--text); padding-bottom: 56px; }
-    .container { max-width: 580px; margin: 0 auto; padding: 12px; }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+
+    body {
+      background: radial-gradient(circle at top right, #082f49 0%, #020617 45%, #020617 100%);
+      color: var(--text);
+      padding-bottom: 60px;
+      min-height: 100vh;
+    }
+
+    .container {
+      max-width: 580px;
+      margin: 0 auto;
+      padding: 12px;
+    }
 
     .hero-header {
-      background: linear-gradient(135deg, #0f766e 0%, #0d9488 55%, #0284c7 100%);
-      color: #fff;
+      background: linear-gradient(135deg, rgba(13, 148, 136, 0.28) 0%, rgba(6, 182, 212, 0.18) 55%, rgba(15, 23, 42, 0.9) 100%);
+      color: var(--text);
+      border: 1px solid rgba(6, 182, 212, 0.35);
       border-radius: 18px;
       padding: 16px;
       margin-bottom: 12px;
-      box-shadow: 0 8px 20px rgba(13, 148, 136, 0.2);
+      backdrop-filter: blur(12px);
+      box-shadow: 0 0 24px rgba(6, 182, 212, 0.12);
     }
-    .hero-header h1 { font-size: 1.25rem; font-weight: 700; letter-spacing: -0.2px; }
-    .hero-sub { font-size: 0.78rem; opacity: 0.9; margin-top: 2px; }
-    .hero-top { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+
+    .hero-header h1 {
+      font-size: 1.25rem;
+      font-weight: 800;
+      letter-spacing: -0.2px;
+      background: linear-gradient(90deg, #ffffff, #67e8f9);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .hero-sub {
+      font-size: 0.78rem;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+
+    .hero-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+    }
+
     .ghost-btn {
       width: auto;
       margin-top: 0;
-      padding: 6px 12px;
-      font-size: 0.78rem;
+      padding: 6px 13px;
+      font-size: 0.76rem;
       border-radius: 999px;
-      background: rgba(255,255,255,0.18);
-      color: #fff;
-      border: 1px solid rgba(255,255,255,0.35);
-      backdrop-filter: blur(4px);
+      background: rgba(15, 23, 42, 0.75);
+      color: var(--accent-blue);
+      border: 1px solid rgba(56, 189, 248, 0.4);
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
     }
-    .ghost-btn:hover { background: rgba(255,255,255,0.28); }
+
+    .ghost-btn:hover {
+      background: rgba(56, 189, 248, 0.15);
+    }
 
     .card {
       background: var(--card);
@@ -59,14 +103,45 @@
       border-radius: 16px;
       padding: 15px;
       margin-bottom: 12px;
-      box-shadow: 0 3px 10px rgba(15, 23, 42, 0.04);
+      backdrop-filter: blur(12px);
+      box-shadow: 0 8px 24px rgba(2, 6, 23, 0.45);
     }
-    h2 { font-size: 1rem; margin-bottom: 10px; color: var(--text); font-weight: 700; }
-    .muted { color: var(--muted); font-size: 0.8rem; }
-    .row-between { display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; }
 
-    .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-top: 8px; }
-    .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 8px; }
+    h2 {
+      font-size: 0.92rem;
+      margin-bottom: 10px;
+      color: var(--text);
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+    }
+
+    .muted {
+      color: var(--muted);
+      font-size: 0.8rem;
+    }
+
+    .row-between {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin-top: 8px;
+    }
 
     .stat-box {
       background: var(--soft);
@@ -74,85 +149,163 @@
       border-radius: 12px;
       padding: 10px;
     }
-    .stat-label { font-size: 0.72rem; color: var(--muted); font-weight: 500; }
-    .stat-val { font-size: 0.94rem; font-weight: 700; margin-top: 4px; }
+
+    .stat-label {
+      font-size: 0.72rem;
+      color: var(--muted);
+      font-weight: 500;
+    }
+
+    .stat-val {
+      font-size: 0.94rem;
+      font-weight: 800;
+      margin-top: 4px;
+      color: var(--text);
+    }
+
     .ok { color: var(--ok); }
     .warn { color: var(--warn); }
     .danger { color: var(--danger); }
 
     .badge {
       display: inline-block;
-      padding: 2px 8px;
+      padding: 2px 9px;
       border-radius: 999px;
       font-size: 0.72rem;
-      font-weight: 600;
+      font-weight: 700;
     }
-    .badge-ok { background: var(--ok-soft); color: var(--ok); }
-    .badge-warn { background: var(--warn-soft); color: var(--warn); }
-    .badge-danger { background: var(--danger-soft); color: var(--danger); }
 
-    label { display: block; font-size: 0.8rem; font-weight: 600; margin-top: 10px; margin-bottom: 4px; color: #334155; }
+    .badge-ok { background: var(--ok-soft); color: var(--ok); border: 1px solid rgba(34, 197, 94, 0.3); }
+    .badge-warn { background: var(--warn-soft); color: var(--warn); border: 1px solid rgba(245, 158, 11, 0.3); }
+    .badge-danger { background: var(--danger-soft); color: var(--danger); border: 1px solid rgba(239, 68, 68, 0.3); }
+
+    label {
+      display: block;
+      font-size: 0.78rem;
+      font-weight: 600;
+      margin-top: 10px;
+      margin-bottom: 4px;
+      color: #cbd5e1;
+    }
+
     input, select, button {
       width: 100%;
       padding: 10px 12px;
       border-radius: 11px;
-      border: 1px solid #cbd5e1;
-      font-size: 0.92rem;
-      background: #ffffff;
-      color: #0f172a;
-      color-scheme: light;
+      border: 1px solid #334155;
+      font-size: 0.9rem;
+      background: #0f172a;
+      color: var(--text);
+      color-scheme: dark;
     }
+
+    select option {
+      background: #0f172a;
+      color: #f1f5f9;
+    }
+
     select.month-picker {
-      background: #ccfbf1;
-      color: #0f172a;
-      border: 1.5px solid #0d9488;
+      background: rgba(6, 182, 212, 0.12);
+      color: #67e8f9;
+      border: 1px solid rgba(6, 182, 212, 0.45);
       font-weight: 700;
       margin-top: 0;
     }
-    input:focus, select:focus { outline: 2px solid rgba(13, 148, 136, 0.25); border-color: var(--primary); }
+
+    input:focus, select:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(6, 182, 212, 0.2);
+    }
 
     button {
-      background: var(--primary);
-      color: #fff;
+      background: linear-gradient(135deg, #0d9488 0%, #0891b2 100%);
+      color: #ffffff;
       border: none;
-      font-weight: 600;
+      font-weight: 700;
       cursor: pointer;
       margin-top: 12px;
-      transition: transform 0.08s ease, background 0.15s ease;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+      transition: transform 0.08s ease, box-shadow 0.15s ease, opacity 0.15s ease;
     }
-    button:active { transform: scale(0.99); }
-    button:hover { background: var(--primary-dark); }
-    button.secondary { background: #e2e8f0; color: #0f172a; }
-    button.secondary:hover { background: #cbd5e1; }
-    button.danger-btn { background: var(--danger-soft); color: var(--danger); }
-    button.danger-btn:hover { background: #fecaca; }
-    button.small { width: auto; padding: 6px 10px; font-size: 0.78rem; margin-top: 0; border-radius: 9px; }
 
-    .quick-months { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-top: 8px; }
-    .quick-months button { margin-top: 0; padding: 7px 8px; font-size: 0.76rem; }
+    button:active { transform: scale(0.99); }
+    button:hover {
+      box-shadow: 0 0 14px rgba(6, 182, 212, 0.35);
+      opacity: 0.95;
+    }
+
+    button.secondary {
+      background: #1e293b;
+      color: #e2e8f0;
+      border: 1px solid #334155;
+    }
+
+    button.secondary:hover {
+      background: #334155;
+      box-shadow: none;
+    }
+
+    button.danger-btn {
+      background: var(--danger-soft);
+      color: #fca5a5;
+      border: 1px solid rgba(239, 68, 68, 0.4);
+    }
+
+    button.danger-btn:hover {
+      background: rgba(239, 68, 68, 0.28);
+      box-shadow: none;
+    }
+
+    button.small {
+      width: auto;
+      padding: 6px 10px;
+      font-size: 0.72rem;
+      margin-top: 0;
+      border-radius: 9px;
+    }
+
+    .quick-months {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 6px;
+      margin-top: 8px;
+    }
+
+    .quick-months button {
+      margin-top: 0;
+      padding: 7px 6px;
+      font-size: 0.72rem;
+    }
 
     .nav-tabs {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
       gap: 6px;
       margin-bottom: 12px;
-      background: #e2e8f0;
-      padding: 4px;
+      background: rgba(15, 23, 42, 0.85);
+      border: 1px solid var(--border);
+      padding: 5px;
       border-radius: 14px;
     }
+
     .tab-btn {
       margin-top: 0;
       padding: 9px 6px;
-      font-size: 0.78rem;
+      font-size: 0.74rem;
       border-radius: 10px;
       background: transparent;
-      color: #334155;
-      font-weight: 600;
+      color: var(--muted);
+      font-weight: 700;
+      border: none;
     }
+
     .tab-btn.active {
-      background: #fff;
-      color: var(--primary-dark);
-      box-shadow: 0 2px 6px rgba(15, 23, 42, 0.08);
+      background: linear-gradient(135deg, rgba(13, 148, 136, 0.35), rgba(6, 182, 212, 0.28));
+      color: #67e8f9;
+      border: 1px solid rgba(6, 182, 212, 0.45);
+      box-shadow: 0 0 12px rgba(6, 182, 212, 0.15);
     }
 
     .chart-card {
@@ -162,31 +315,57 @@
       padding: 12px;
       margin-top: 10px;
     }
-    .chart-row { margin-top: 9px; }
+
+    .chart-row { margin-top: 10px; }
     .chart-row:first-child { margin-top: 0; }
-    .bar-bg { height: 9px; background: #e2e8f0; border-radius: 999px; overflow: hidden; margin-top: 5px; }
-    .bar-fill { height: 100%; background: var(--ok); border-radius: 999px; transition: width 0.3s ease; }
-    .bar-fill.blue { background: var(--accent); }
-    .bar-fill.teal { background: var(--primary); }
+
+    .bar-bg {
+      height: 8px;
+      background: #1e293b;
+      border-radius: 999px;
+      overflow: hidden;
+      margin-top: 5px;
+    }
+
+    .bar-fill {
+      height: 100%;
+      background: var(--ok);
+      border-radius: 999px;
+      transition: width 0.3s ease;
+    }
+
+    .bar-fill.blue { background: var(--accent-blue); }
+    .bar-fill.teal { background: #14b8a6; }
     .bar-fill.warn { background: var(--warn); }
     .bar-fill.danger { background: var(--danger); }
 
     .sub-box {
       background: var(--soft);
-      border: 1px dashed #cbd5e1;
+      border: 1px dashed #334155;
       border-radius: 12px;
       padding: 10px 12px;
       margin-top: 10px;
     }
+
     .confirm-box {
       background: var(--danger-soft);
-      border: 1px solid #fca5a5;
+      border: 1px solid rgba(239, 68, 68, 0.45);
       border-radius: 12px;
       padding: 10px 12px;
       margin-top: 8px;
     }
-    .inline-edit { display: flex; gap: 6px; margin-top: 8px; align-items: center; }
-    .inline-edit input { margin-top: 0; flex: 1; }
+
+    .inline-edit {
+      display: flex;
+      gap: 6px;
+      margin-top: 8px;
+      align-items: center;
+    }
+
+    .inline-edit input {
+      margin-top: 0;
+      flex: 1;
+    }
 
     .month-range-box {
       background: var(--soft);
@@ -195,6 +374,7 @@
       padding: 12px;
       margin-top: 8px;
     }
+
     .month-breakdown-item {
       display: flex;
       justify-content: space-between;
@@ -203,10 +383,16 @@
       border-top: 1px solid var(--border);
       font-size: 0.82rem;
     }
+
     .month-breakdown-item:first-child { border-top: none; }
 
-    .budget-item { border-top: 1px solid var(--border); padding: 11px 0; }
+    .budget-item {
+      border-top: 1px solid var(--border);
+      padding: 11px 0;
+    }
+
     .budget-item:first-child { border-top: none; }
+
     .sub-row {
       display: flex;
       justify-content: space-between;
@@ -214,9 +400,11 @@
       gap: 6px;
       font-size: 0.8rem;
       padding: 6px 0;
-      border-top: 1px solid #e2e8f0;
+      border-top: 1px solid #334155;
     }
+
     .sub-row:first-child { border-top: none; }
+
     .tx-item {
       display: flex;
       justify-content: space-between;
@@ -226,16 +414,52 @@
       border-top: 1px solid var(--border);
       font-size: 0.86rem;
     }
+
     .tx-item:first-child { border-top: none; }
+
+    .donut-wrap {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-top: 10px;
+    }
+
+    .donut-ring {
+      width: 82px;
+      height: 82px;
+      border-radius: 50%;
+      position: relative;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .donut-hole {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      background: #0f172a;
+      border: 1px solid var(--border);
+    }
+
+    .legend-dot {
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      margin-right: 6px;
+    }
+
     .hidden { display: none; }
-    #statusMsg { font-size: 0.82rem; margin-top: 8px; color: var(--primary-dark); font-weight: 600; }
+    #statusMsg { font-size: 0.82rem; margin-top: 8px; color: #67e8f9; font-weight: 600; }
   </style>
 </head>
 <body>
   <div class="container">
     <!-- LOGIN -->
-    <div id="authSection" class="card">
-      <h1>Anggaran Keluarga</h1>
+    <div id="authSection" class="card" style="margin-top:24px;">
+      <h1 style="font-size:1.3rem; color:#67e8f9; margin-bottom:4px;">Anggaran Keluarga</h1>
       <p class="muted">Masuk menggunakan akun keluarga di Firebase Authentication.</p>
       <form id="loginForm">
         <label for="loginEmail">Email</label>
@@ -262,7 +486,7 @@
 
       <div class="card">
         <div class="row-between">
-          <span style="font-size:0.8rem; font-weight:700; color:#0f766e;">Periode Bulan</span>
+          <span style="font-size:0.78rem; font-weight:700; color:#67e8f9; text-transform:uppercase; letter-spacing:0.5px;">Periode Bulan</span>
           <span id="monthBadge" class="badge badge-ok">Aktif</span>
         </div>
         <div class="grid-2" style="margin-top:6px;">
@@ -296,13 +520,13 @@
         <!-- GAJI / PEMASUKAN BISA DIEDIT & DI-CLEAR -->
         <div class="sub-box">
           <div class="row-between">
-            <span style="font-size:0.82rem; font-weight:700;">Gaji / Pemasukan Bulan Ini</span>
+            <span style="font-size:0.8rem; font-weight:700; color:#cbd5e1;">Gaji / Pemasukan Bulan Ini</span>
             <div style="display:flex; gap:6px;">
               <button type="button" id="toggleIncomeEditBtn" class="secondary small">Edit Gaji</button>
               <button type="button" id="clearIncomeBtn" class="danger-btn small">Clear</button>
             </div>
           </div>
-          <div id="incomeValueText" style="font-size:1.1rem; font-weight:800; margin-top:4px; color:var(--primary-dark);">
+          <div id="incomeValueText" style="font-size:1.25rem; font-weight:800; margin-top:4px; color:#22c55e;">
             Rp0
           </div>
           <div id="incomeEditRow" class="inline-edit hidden">
@@ -310,7 +534,7 @@
             <button type="button" id="saveIncomeBtn" class="small">Simpan</button>
           </div>
           <div id="clearIncomeConfirmBox" class="confirm-box hidden">
-            <div style="font-size:0.84rem; font-weight:700; color:var(--danger);">
+            <div style="font-size:0.84rem; font-weight:700; color:#fca5a5;">
               apakah anda ingin menghapus Data Gaji ?
             </div>
             <div style="display:flex; gap:8px; margin-top:8px;">
@@ -339,15 +563,15 @@
           <div class="grid-2">
             <div class="stat-box">
               <div class="stat-label">List Sesuai Bulanan</div>
-              <div id="posCountDisplay" class="stat-val">0 Pos</div>
+              <div id="posCountDisplay" class="stat-val" style="color:#67e8f9;">0 Pos</div>
             </div>
 
             <div class="stat-box">
               <div class="row-between">
                 <span class="stat-label">Total Anggaran</span>
-                <button type="button" id="toggleBudgetEditBtn" class="secondary small" style="padding:2px 7px; font-size:0.7rem;">Edit</button>
+                <button type="button" id="toggleBudgetEditBtn" class="secondary small" style="padding:2px 7px; font-size:0.68rem;">Edit</button>
               </div>
-              <div id="totalBudgetDisplay" class="stat-val">Rp0</div>
+              <div id="totalBudgetDisplay" class="stat-val" style="color:#38bdf8;">Rp0</div>
             </div>
           </div>
 
@@ -370,23 +594,34 @@
             </div>
             <div class="stat-box">
               <div class="stat-label">Terpakai Bulan Ini</div>
-              <div id="monthlySpentDisplay" class="stat-val">Rp0</div>
+              <div id="monthlySpentDisplay" class="stat-val danger">Rp0</div>
             </div>
           </div>
 
-          <div style="margin-top:10px; font-size:0.84rem; line-height:1.55;">
+          <div style="margin-top:10px; font-size:0.84rem; line-height:1.6;">
             <div>Selisih Anggaran vs Gaji: <strong id="diffIncomeDisplay"></strong></div>
             <div>Sisa Saldo Gaji vs Terpakai: <strong id="remainIncomeDisplay"></strong></div>
+          </div>
+        </div>
+
+        <!-- GRAFIK PROPORSI KATEGORI PENGELUARAN (DONUT CHART) -->
+        <div class="card">
+          <div class="row-between">
+            <h2 style="margin-bottom:0;">Proporsi Kategori Pengeluaran</h2>
+            <span class="muted">Bulan Ini</span>
+          </div>
+          <div id="categoryDonutSection">
+            <p class="muted" style="margin-top:6px;">Belum ada pengeluaran pada bulan ini.</p>
           </div>
         </div>
 
         <!-- FILTER PENGELUARAN BEBERAPA BULAN -->
         <div class="card">
           <div class="row-between">
-            <h2 style="margin-bottom:0;">Filter Total Pengeluaran Beberapa Bulan</h2>
+            <h2 style="margin-bottom:0;">Filter Pengeluaran Beberapa Bulan</h2>
             <span id="rangeCountBadge" class="badge badge-ok">0 Bulan</span>
           </div>
-          <p class="muted" style="margin-top:4px;">Pilih rentang bulan untuk mengetahui total keuangan yang sudah dikeluarkan dalam beberapa bulan.</p>
+          <p class="muted" style="margin-top:4px;">Pilih rentang bulan untuk mengetahui total keuangan yang sudah dikeluarkan.</p>
 
           <div class="month-range-box">
             <div class="grid-2" style="margin-top:0;">
@@ -408,12 +643,12 @@
 
             <div class="grid-2" style="margin-top:10px;">
               <div class="stat-box">
-                <div class="stat-label">Total Pengeluaran Rentang Bulan</div>
+                <div class="stat-label">Total Pengeluaran Rentang</div>
                 <div id="rangeTotalSpentDisplay" class="stat-val danger">Rp0</div>
               </div>
               <div class="stat-box">
                 <div class="stat-label">Rata-Rata per Bulan</div>
-                <div id="rangeAvgSpentDisplay" class="stat-val">Rp0</div>
+                <div id="rangeAvgSpentDisplay" class="stat-val" style="color:#67e8f9;">Rp0</div>
               </div>
             </div>
 
@@ -471,7 +706,7 @@
       <div id="tabRekap" class="hidden">
         <div class="card">
           <div class="row-between">
-            <h2 style="margin-bottom:0;">Rekap Anggaran (Pilih List Lama / Isi Manual)</h2>
+            <h2 style="margin-bottom:0;">Rekap Anggaran (List Lama / Manual)</h2>
             <button type="button" id="cancelEditBudgetBtn" class="secondary small hidden">Batal Edit</button>
           </div>
           <form id="rekapForm">
@@ -520,7 +755,7 @@
       <div id="tabRincian" class="hidden">
         <div class="card">
           <h2>Tambah List Detail Item dalam Pos</h2>
-          <p class="muted">Contoh: pilih pos <strong>Belanja bulanan</strong>, lalu tambahkan rincian seperti <em>Beras</em>, <em>Minyak goreng</em>, dan <em>Telur</em>.</p>
+          <p class="muted">Contoh: pilih pos <strong style="color:#67e8f9;">Belanja Bulanan</strong>, lalu tambahkan rincian seperti <em>Beras</em>, <em>Minyak goreng</em>, dan <em>Telur</em>.</p>
           <form id="subItemForm">
             <label for="subTargetBudget">Pilih Pos Anggaran Induk</label>
             <select id="subTargetBudget" required></select>
@@ -567,7 +802,7 @@
     const auth = getAuth(app);
     const db = getFirestore(app);
 
-     const PREVIOUS_LIST = [
+    const PREVIOUS_LIST = [
       { name: "Angsuran BRI", category: "Cicilan & Utang", limit: 1981000 },
       { name: "Listrik", category: "Utilitas & Rumah", limit: 130000 },
       { name: "PDAM", category: "Utilitas & Rumah", limit: 140000 },
@@ -589,7 +824,7 @@
       { name: "Paket/Pulsa", category: "Utilitas & Rumah", limit: 50000 },
       { name: "Service kendaraan", category: "Transportasi & Kendaraan", limit: 160000 },
       { name: "Parkir kendaraan", category: "Transportasi & Kendaraan", limit: 50000 },
-      { name: "Tabungan", category: "Tabungan & Cadangan", limit: 50000 },
+      { name: "Tabungan", category: "Tabungan & Cadangan", limit: 50000 }
     ];
 
     const MONTH_NAMES_ID = {
@@ -606,6 +841,8 @@
       "11": "November",
       "12": "Desember"
     };
+
+    const DONUT_COLORS = ["#22c55e", "#06b6d4", "#f59e0b", "#a855f7", "#ef4444", "#38bdf8", "#14b8a6", "#f43f5e"];
 
     const rupiah = (n) => "Rp" + Number(n || 0).toLocaleString("id-ID");
     const formatMonthLabel = (ym) => {
@@ -742,7 +979,6 @@
       handleMonthChange();
     });
 
-    // Preset filter beberapa bulan
     document.getElementById("last3MonthsBtn").addEventListener("click", () => {
       const endM = getSelectedMonth();
       rangeStartMonthInput.value = shiftMonth(endM, -2);
@@ -904,7 +1140,6 @@
       });
     }
 
-    // Edit & Clear Gaji / Pemasukan
     document.getElementById("toggleIncomeEditBtn").addEventListener("click", () => {
       document.getElementById("clearIncomeConfirmBox").classList.add("hidden");
       const row = document.getElementById("incomeEditRow");
@@ -1165,9 +1400,50 @@
             <strong>${formatMonthLabel(m)}</strong>
             <span class="muted">(${perMonthCounts[m] || 0} transaksi)</span>
           </div>
-          <strong>${rupiah(perMonthTotals[m] || 0)}</strong>
+          <strong style="color:#f87171;">${rupiah(perMonthTotals[m] || 0)}</strong>
         </div>
       `).join("");
+    }
+
+    function renderCategoryDonut(spentByCategory, totalSpent) {
+      const targetEl = document.getElementById("categoryDonutSection");
+      const entries = Object.entries(spentByCategory).filter(([, val]) => val > 0).sort((a, b) => b[1] - a[1]);
+
+      if (!entries.length || totalSpent <= 0) {
+        targetEl.innerHTML = `<p class="muted" style="margin-top:6px;">Belum ada pengeluaran pada bulan ini.</p>`;
+        return;
+      }
+
+      let currentDeg = 0;
+      const gradientStops = [];
+      const legendItems = [];
+
+      entries.forEach(([catName, amount], idx) => {
+        const color = DONUT_COLORS[idx % DONUT_COLORS.length];
+        const pctExact = (amount / totalSpent) * 100;
+        const pctRound = Math.round(pctExact);
+        const deg = (amount / totalSpent) * 360;
+        gradientStops.push(`${color} ${currentDeg.toFixed(1)}deg ${(currentDeg + deg).toFixed(1)}deg`);
+        currentDeg += deg;
+
+        legendItems.push(`
+          <div class="row-between" style="font-size:0.78rem; padding:3px 0;">
+            <span class="muted"><span class="legend-dot" style="background:${color};"></span>${catName}</span>
+            <strong>${pctRound}% <span class="muted">(${rupiah(amount)})</span></strong>
+          </div>
+        `);
+      });
+
+      targetEl.innerHTML = `
+        <div class="donut-wrap">
+          <div class="donut-ring" style="background: conic-gradient(${gradientStops.join(", ")});">
+            <div class="donut-hole"></div>
+          </div>
+          <div style="flex:1;">
+            ${legendItems.join("")}
+          </div>
+        </div>
+      `;
     }
 
     function renderAll() {
@@ -1201,6 +1477,7 @@
       let monthlySpent = 0;
       const spentByBudget = {};
       const spentBySubItem = {};
+      const spentByCategory = {};
 
       for (const tx of txData) {
         const amt = Number(tx.amount || 0);
@@ -1209,11 +1486,17 @@
         if (tx.date && tx.date >= sevenDaysStr && tx.date <= todayStr) weeklySpent += amt;
 
         spentByBudget[tx.budgetId] = (spentByBudget[tx.budgetId] || 0) + amt;
+        const matchedBudget = budgetsData.find((b) => b.id === tx.budgetId);
+        const catName = matchedBudget ? (matchedBudget.category || "Lainnya") : "Lainnya";
+        spentByCategory[catName] = (spentByCategory[catName] || 0) + amt;
+
         if (tx.budgetId && tx.subItemId) {
           const key = `${tx.budgetId}__${tx.subItemId}`;
           spentBySubItem[key] = (spentBySubItem[key] || 0) + amt;
         }
       }
+
+      renderCategoryDonut(spentByCategory, monthlySpent);
 
       const effectiveTotalBudget = Number(manualTotalBudget || 0);
       const diffVsIncome = monthlyIncome - effectiveTotalBudget;
@@ -1243,14 +1526,14 @@
         <div class="chart-row">
           <div class="row-between" style="font-size:0.82rem;">
             <span><strong>Gaji / Pemasukan</strong></span>
-            <strong>${rupiah(monthlyIncome)} (100%)</strong>
+            <strong style="color:#5eead4;">${rupiah(monthlyIncome)} (100%)</strong>
           </div>
           <div class="bar-bg"><div class="bar-fill teal" style="width:100%"></div></div>
         </div>
         <div class="chart-row">
           <div class="row-between" style="font-size:0.82rem;">
             <span><strong>Total Anggaran</strong></span>
-            <strong>${rupiah(effectiveTotalBudget)}</strong>
+            <strong style="color:#7dd3fc;">${rupiah(effectiveTotalBudget)}</strong>
           </div>
           <div class="bar-bg"><div class="bar-fill blue" style="width:${pctBudgetVsMax}%"></div></div>
         </div>
@@ -1302,8 +1585,8 @@
             <div class="budget-item">
               <div class="row-between">
                 <div>
-                  <strong>${b.name}</strong>
-                  <div class="muted">${b.category} • Anggaran: <strong>${rupiah(limit)}</strong></div>
+                  <strong style="color:#f8fafc;">${b.name}</strong>
+                  <div class="muted">${b.category} • Anggaran: <strong style="color:#67e8f9;">${rupiah(limit)}</strong></div>
                 </div>
                 <div style="display:flex; gap:6px;">
                   <button type="button" class="secondary small" data-edit-budget="${b.id}">Edit</button>
@@ -1362,7 +1645,7 @@
                       <strong>${it.name}</strong>
                       <div class="muted">Terpakai ${rupiah(itSpent)} / ${rupiah(itLimit)} (Sisa ${rupiah(itLimit - itSpent)})</div>
                     </div>
-                    <button type="button" class="secondary small" data-del-item="${it.docId}">Hapus</button>
+                    <button type="button" class="danger-btn small" data-del-item="${it.docId}">Hapus</button>
                   </div>
                 `;
               }).join("")
@@ -1371,7 +1654,7 @@
           return `
             <div class="budget-item">
               <div class="row-between">
-                <strong>${b.name}</strong>
+                <strong style="color:#67e8f9;">${b.name}</strong>
                 <span class="muted">Pos: ${rupiah(posSpent)} / ${rupiah(b.limit)}</span>
               </div>
               <div class="sub-box">${itemsHtml}</div>
@@ -1395,13 +1678,13 @@
             <div>
               <div>
                 <strong>${tx.budgetName || tx.budgetId}</strong>
-                ${tx.subItemName ? `• <span style="color:var(--primary-dark); font-weight:600;">${tx.subItemName}</span>` : ""}
+                ${tx.subItemName ? `• <span style="color:#67e8f9; font-weight:600;">${tx.subItemName}</span>` : ""}
               </div>
               <div class="muted">${tx.date || ""} ${tx.note ? `• ${tx.note}` : ""}</div>
             </div>
             <div style="display:flex; align-items:center; gap:8px;">
-              <strong>${rupiah(tx.amount)}</strong>
-              <button type="button" class="secondary small" data-del-tx="${tx.id}">Hapus</button>
+              <strong style="color:#f87171;">-${rupiah(tx.amount)}</strong>
+              <button type="button" class="danger-btn small" data-del-tx="${tx.id}">Hapus</button>
             </div>
           </div>
         `).join("");
