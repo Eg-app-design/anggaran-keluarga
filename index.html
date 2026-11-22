@@ -458,33 +458,34 @@
     .bar-fill.warn { background: var(--warn); }
     .bar-fill.danger { background: var(--danger); }
 
+    /* Grafik Batang Bulanan di Tab Filter (ukuran sedang/ringkas) */
     .monthly-col-chart {
       display: flex;
       align-items: flex-end;
       justify-content: space-between;
-      gap: 8px;
-      height: 138px;
-      padding: 12px 10px 8px;
+      gap: 6px;
+      height: 112px;
+      padding: 10px 8px 6px;
       background: rgba(2, 6, 23, 0.65);
       border: 1px solid var(--border);
       border-radius: 12px;
-      margin-top: 10px;
+      margin-top: 8px;
       overflow-x: auto;
     }
 
     .monthly-col-item {
       flex: 1;
-      min-width: 52px;
+      min-width: 48px;
       height: 100%;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: flex-end;
-      gap: 5px;
+      gap: 4px;
     }
 
     .monthly-col-val {
-      font-size: 0.65rem;
+      font-size: 0.62rem;
       font-weight: 700;
       color: #67e8f9;
       text-align: center;
@@ -493,31 +494,85 @@
 
     .monthly-col-track {
       width: 100%;
-      max-width: 34px;
-      height: 82px;
+      max-width: 30px;
+      height: 62px;
       background: #1e293b;
-      border-radius: 8px 8px 4px 4px;
+      border-radius: 7px 7px 4px 4px;
       display: flex;
       align-items: flex-end;
       overflow: hidden;
-      border: 1px solid rgba(56, 189, 248, 0.2);
+      border: 1px solid rgba(56, 189, 248, 0.25);
     }
 
     .monthly-col-fill {
       width: 100%;
       background: linear-gradient(180deg, #22d3ee 0%, #0d9488 100%);
-      border-radius: 6px 6px 2px 2px;
+      border-radius: 5px 5px 2px 2px;
       min-height: 4px;
       transition: height 0.35s ease;
       box-shadow: 0 0 10px rgba(34, 211, 238, 0.25);
     }
 
     .monthly-col-label {
-      font-size: 0.68rem;
+      font-size: 0.65rem;
       font-weight: 700;
       color: var(--muted);
       text-align: center;
       white-space: nowrap;
+    }
+
+    /* Grafik Pertahun 12 bulan penuh tanpa scroll ke samping + lingkaran persen */
+    .yearly-full-strip {
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap: 3px;
+      margin-top: 10px;
+      padding: 8px 6px;
+      background: rgba(2, 6, 23, 0.65);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      align-items: end;
+    }
+
+    .yearly-m-col {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 3px;
+      min-width: 0;
+    }
+
+    .yearly-m-pct {
+      font-size: 0.54rem;
+      font-weight: 700;
+      color: #67e8f9;
+      line-height: 1;
+    }
+
+    .yearly-m-track {
+      width: 100%;
+      max-width: 12px;
+      height: 36px;
+      background: #1e293b;
+      border-radius: 4px;
+      display: flex;
+      align-items: flex-end;
+      overflow: hidden;
+    }
+
+    .yearly-m-fill {
+      width: 100%;
+      background: linear-gradient(180deg, #38bdf8 0%, #0d9488 100%);
+      border-radius: 3px;
+      min-height: 2px;
+      transition: height 0.3s ease;
+    }
+
+    .yearly-m-lbl {
+      font-size: 0.56rem;
+      font-weight: 700;
+      color: var(--muted);
+      line-height: 1;
     }
 
     .sub-box {
@@ -619,8 +674,8 @@
     }
 
     .donut-ring {
-      width: 82px;
-      height: 82px;
+      width: 84px;
+      height: 84px;
       border-radius: 50%;
       position: relative;
       flex-shrink: 0;
@@ -630,11 +685,17 @@
     }
 
     .donut-hole {
-      width: 50px;
-      height: 50px;
+      width: 54px;
+      height: 54px;
       border-radius: 50%;
       background: #0f172a;
       border: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.72rem;
+      font-weight: 800;
+      color: #67e8f9;
     }
 
     .legend-dot {
@@ -850,18 +911,18 @@
           </div>
         </div>
 
-        <!-- GRAFIK BATANG BULANAN -->
+        <!-- GRAFIK PERTAHUN (1 TAHUN PENUH TANPA SCROLL KE SAMPING + LINGKARAN PERSEN) -->
         <div class="card">
           <div class="row-between">
             <h2 class="title-with-ico" style="margin-bottom:0;">
-              <svg class="ico" style="color:#22d3ee;" viewBox="0 0 24 24"><rect x="3" y="12" width="4" height="8" rx="1"/><rect x="10" y="7" width="4" height="13" rx="1"/><rect x="17" y="4" width="4" height="16" rx="1"/></svg>
-              Grafik Batang Bulanan
+              <svg class="ico" style="color:#22d3ee;" viewBox="0 0 24 24"><path d="M21.21 15.89A10 10 0 1 1 8.11 2.99"/><path d="M22 12A10 10 0 0 0 12 2v10z"/></svg>
+              Grafik Pertahun
             </h2>
-            <span id="monthlyBarRangeLabel" class="muted">Rentang Filter</span>
+            <span id="yearlyChartYearLabel" class="badge badge-ok">2026</span>
           </div>
-          <p class="muted" style="margin-top:4px;">Perbandingan total pengeluaran antarbulan (sinkron dengan rentang di tab <strong>Filter</strong>).</p>
-          <div id="monthlyColumnChart" class="monthly-col-chart">
-            <p class="muted">Belum ada data bulan untuk digrafikkan.</p>
+          <p class="muted" style="margin-top:4px;">Ringkasan pengeluaran 1 tahun penuh (Jan–Des) dengan proporsi persen.</p>
+          <div id="yearlyChartSection">
+            <p class="muted" style="margin-top:6px;">Belum ada data pengeluaran tahun ini.</p>
           </div>
         </div>
 
@@ -1040,8 +1101,22 @@
         </div>
       </div>
 
-      <!-- TAB 5: FILTER (FILTER PENGELUARAN BEBERAPA BULAN) -->
+      <!-- TAB 5: FILTER (GRAFIK BATANG BULANAN DI ATAS + FILTER PENGELUARAN BEBERAPA BULAN) -->
       <div id="tabFilter" class="hidden">
+        <div class="card">
+          <div class="row-between">
+            <h2 class="title-with-ico" style="margin-bottom:0;">
+              <svg class="ico" style="color:#22d3ee;" viewBox="0 0 24 24"><rect x="3" y="12" width="4" height="8" rx="1"/><rect x="10" y="7" width="4" height="13" rx="1"/><rect x="17" y="4" width="4" height="16" rx="1"/></svg>
+              Grafik Batang Bulanan
+            </h2>
+            <span id="monthlyBarRangeLabel" class="muted">Rentang Filter</span>
+          </div>
+          <p class="muted" style="margin-top:3px;">Sinkron otomatis dengan rentang bulan yang dipilih di bawah.</p>
+          <div id="monthlyColumnChart" class="monthly-col-chart">
+            <p class="muted">Belum ada data bulan untuk digrafikkan.</p>
+          </div>
+        </div>
+
         <div class="card">
           <div class="row-between">
             <h2 class="title-with-ico" style="margin-bottom:0;">
@@ -1366,6 +1441,7 @@
       editingBudgetDocId = null;
       cancelEditBudgetBtn.classList.add("hidden");
       document.getElementById("clearIncomeConfirmBox").classList.add("hidden");
+      renderYearlyChart();
       if (auth.currentUser) subscribeMonth(getSelectedMonth());
     }
 
@@ -1500,6 +1576,7 @@
       unsubAllTx = onSnapshot(collection(db, "transactions"), (snap) => {
         allTxData = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
         renderRangeSummary();
+        renderYearlyChart();
       });
     }
 
@@ -1762,6 +1839,91 @@
       }
     });
 
+    function renderYearlyChart() {
+      const targetEl = document.getElementById("yearlyChartSection");
+      const yearBadge = document.getElementById("yearlyChartYearLabel");
+      const activeYear = yearSelect.value || String(now.getFullYear());
+      yearBadge.textContent = activeYear;
+
+      const monthTotals = Array(12).fill(0);
+      let yearTotal = 0;
+
+      for (const tx of allTxData) {
+        const ym = tx.month || (tx.date ? tx.date.slice(0, 7) : "");
+        if (!ym.startsWith(activeYear + "-")) continue;
+        const mIdx = Number(ym.split("-")[1]) - 1;
+        const amt = Number(tx.amount || 0);
+        if (mIdx >= 0 && mIdx < 12) {
+          monthTotals[mIdx] += amt;
+          yearTotal += amt;
+        }
+      }
+
+      if (yearTotal <= 0) {
+        targetEl.innerHTML = `<p class="muted" style="margin-top:6px;">Belum ada pengeluaran tercatat pada tahun ${activeYear}.</p>`;
+        return;
+      }
+
+      const activeMonths = monthTotals
+        .map((amt, idx) => ({
+          mCode: pad(idx + 1),
+          shortName: MONTH_SHORT_ID[pad(idx + 1)],
+          amt,
+          pct: Math.round((amt / yearTotal) * 100)
+        }))
+        .filter((item) => item.amt > 0)
+        .sort((a, b) => b.amt - a.amt);
+
+      let currentDeg = 0;
+      const gradientStops = activeMonths.map((item, idx) => {
+        const color = DONUT_COLORS[idx % DONUT_COLORS.length];
+        const deg = (item.amt / yearTotal) * 360;
+        const stop = `${color} ${currentDeg.toFixed(1)}deg ${(currentDeg + deg).toFixed(1)}deg`;
+        currentDeg += deg;
+        item.color = color;
+        return stop;
+      });
+
+      const topPct = activeMonths[0] ? activeMonths[0].pct : 0;
+      const legendHtml = activeMonths.slice(0, 5).map((item) => `
+        <div class="row-between" style="font-size:0.75rem; padding:2px 0;">
+          <span class="muted"><span class="legend-dot" style="background:${item.color};"></span>${item.shortName}</span>
+          <strong>${item.pct}% <span class="muted">(${compactRupiah(item.amt)})</span></strong>
+        </div>
+      `).join("");
+
+      const maxBar = Math.max(...monthTotals, 1);
+      const stripHtml = monthTotals.map((amt, idx) => {
+        const mCode = pad(idx + 1);
+        const pct = Math.round((amt / yearTotal) * 100);
+        const hPct = amt > 0 ? Math.max(12, Math.round((amt / maxBar) * 100)) : 0;
+        return `
+          <div class="yearly-m-col" title="${MONTH_SHORT_ID[mCode]} ${activeYear}: ${rupiah(amt)} (${pct}%)">
+            <div class="yearly-m-pct">${pct > 0 ? pct + "%" : "0%"}</div>
+            <div class="yearly-m-track">
+              <div class="yearly-m-fill" style="height:${hPct}%;"></div>
+            </div>
+            <div class="yearly-m-lbl">${MONTH_SHORT_ID[mCode]}</div>
+          </div>
+        `;
+      }).join("");
+
+      targetEl.innerHTML = `
+        <div class="donut-wrap">
+          <div class="donut-ring" style="background: conic-gradient(${gradientStops.join(", ")});">
+            <div class="donut-hole">${topPct}%</div>
+          </div>
+          <div style="flex:1;">
+            <div style="font-size:0.78rem; font-weight:700; color:#f8fafc; margin-bottom:4px;">
+              Total ${activeYear}: <span style="color:#67e8f9;">${rupiah(yearTotal)}</span>
+            </div>
+            ${legendHtml}
+          </div>
+        </div>
+        <div class="yearly-full-strip" aria-label="Grafik 12 Bulan Penuh">${stripHtml}</div>
+      `;
+    }
+
     function renderMonthlyColumnChart(monthsList, perMonthTotals) {
       const chartEl = document.getElementById("monthlyColumnChart");
       const labelEl = document.getElementById("monthlyBarRangeLabel");
@@ -1875,7 +2037,7 @@
       targetEl.innerHTML = `
         <div class="donut-wrap">
           <div class="donut-ring" style="background: conic-gradient(${gradientStops.join(", ")});">
-            <div class="donut-hole"></div>
+            <div class="donut-hole">${Math.round((entries[0][1] / totalSpent) * 100)}%</div>
           </div>
           <div style="flex:1;">
             ${legendItems.join("")}
@@ -2140,6 +2302,7 @@
       }
 
       renderRangeSummary();
+      renderYearlyChart();
     }
   </script>
 </body>
