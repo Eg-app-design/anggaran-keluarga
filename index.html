@@ -975,7 +975,7 @@
           </div>
         </div>
 
-        <!-- GRAFIK PERTAHUN + TOMBOL FILTER RENTANG TAHUN -->
+        <!-- GRAFIK PERTAHUN + TOMBOL FILTER TAHUN -->
         <div class="card">
           <div class="row-between">
             <h2 class="title-with-ico" style="margin-bottom:0;">
@@ -983,13 +983,9 @@
               Grafik Pertahun
             </h2>
             <div class="year-filter-group">
-              <button type="button" id="toggle2025And2026Btn" class="year-filter-btn" aria-pressed="false" title="Filter cepat gabungan 2025 & 2026">
-                <svg class="ico" style="width:12px;height:12px;" viewBox="0 0 24 24"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
-                2025 & 2026
-              </button>
-              <button type="button" id="toggleYearRangeMenuBtn" class="year-filter-btn" aria-expanded="false" title="Atur rentang tahun bebas (misal 2025 - 2027)">
+              <button type="button" id="toggleYearRangeMenuBtn" class="year-filter-btn" aria-expanded="false" title="Atur rentang tahun (misal 2025 - 2027)">
                 <svg class="ico" style="width:12px;height:12px;" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-                Rentang
+                Filter Tahun
               </button>
               <button type="button" id="resetYearlyFilterBtn" class="year-filter-btn hidden" title="Kembali ke tampilan pertahun">
                 Pertahun
@@ -1429,7 +1425,6 @@
     const detailEl = document.getElementById("detailBreakdownList");
     const detailBreakdownArrow = document.getElementById("detailBreakdownArrow");
 
-    const toggle2025And2026Btn = document.getElementById("toggle2025And2026Btn");
     const toggleYearRangeMenuBtn = document.getElementById("toggleYearRangeMenuBtn");
     const yearRangePopover = document.getElementById("yearRangePopover");
     const yearRangeStartSelect = document.getElementById("yearRangeStartSelect");
@@ -1446,10 +1441,8 @@
     let isRekapListExpanded = false;
     let isDetailBreakdownExpanded = false;
 
-    // Mode filter grafik tahun:
     // null = Pertahun normal (1 tahun penuh sesuai yearSelect)
-    // { start: "2025", end: "2026" } = gabungan 2025 & 2026
-    // { start: "2025", end: "2027" } = gabungan rentang bebas
+    // { start: "2025", end: "2027" } = gabungan rentang tahun terpilih
     let activeYearRangeFilter = null;
     let isYearRangeMenuOpen = false;
 
@@ -1464,40 +1457,11 @@
     populateYearRangeDropdowns();
 
     function syncYearlyFilterButtons() {
-      const is2025To2026 = Boolean(
-        activeYearRangeFilter &&
-        activeYearRangeFilter.start === "2025" &&
-        activeYearRangeFilter.end === "2026"
-      );
-      const isCustomRange = Boolean(activeYearRangeFilter && !is2025To2026);
-
-      toggle2025And2026Btn.classList.toggle("active", is2025To2026);
-      toggle2025And2026Btn.setAttribute("aria-pressed", String(is2025To2026));
-
-      toggleYearRangeMenuBtn.classList.toggle("active", isCustomRange || isYearRangeMenuOpen);
+      toggleYearRangeMenuBtn.classList.toggle("active", Boolean(activeYearRangeFilter || isYearRangeMenuOpen));
       toggleYearRangeMenuBtn.setAttribute("aria-expanded", String(isYearRangeMenuOpen));
       yearRangePopover.classList.toggle("hidden", !isYearRangeMenuOpen);
-
       resetYearlyFilterBtn.classList.toggle("hidden", !activeYearRangeFilter);
     }
-
-    toggle2025And2026Btn.addEventListener("click", () => {
-      const isAlready2025To2026 = Boolean(
-        activeYearRangeFilter &&
-        activeYearRangeFilter.start === "2025" &&
-        activeYearRangeFilter.end === "2026"
-      );
-      if (isAlready2025To2026) {
-        activeYearRangeFilter = null;
-      } else {
-        activeYearRangeFilter = { start: "2025", end: "2026" };
-        yearRangeStartSelect.value = "2025";
-        yearRangeEndSelect.value = "2026";
-      }
-      isYearRangeMenuOpen = false;
-      syncYearlyFilterButtons();
-      renderYearlyChart();
-    });
 
     toggleYearRangeMenuBtn.addEventListener("click", () => {
       isYearRangeMenuOpen = !isYearRangeMenuOpen;
