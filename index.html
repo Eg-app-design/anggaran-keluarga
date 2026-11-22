@@ -160,7 +160,6 @@
       letter-spacing: 0.6px;
     }
 
-    /* Bar Toggle Collapse */
     .collapse-bar {
       width: 100%;
       margin-top: 0;
@@ -202,7 +201,6 @@
       flex-shrink: 0;
     }
 
-    /* Tanda panah kanan berwarna terang kontras */
     .arrow-toggle-ico {
       width: 16px;
       height: 16px;
@@ -886,14 +884,17 @@
 
         <!-- GRAFIK PEMAKAIAN PER POS -->
         <div class="card">
-          <div class="row-between">
-            <h2 class="title-with-ico" style="margin-bottom:0;">
+          <button type="button" id="toggleTopBudgetChartBtn" class="collapse-bar" aria-expanded="false">
+            <span class="collapse-bar-left">
               <svg class="ico" style="color:#f59e0b;" viewBox="0 0 24 24"><path d="M12 20V10"/><path d="M18 20V4"/><path d="M6 20v-6"/></svg>
               Grafik Pemakaian per Pos
-            </h2>
-            <span class="muted">Terpakai vs Batas Pos</span>
-          </div>
-          <div id="topBudgetChart" class="chart-card"></div>
+            </span>
+            <span class="collapse-bar-right">
+              <span class="muted" style="font-size:0.7rem;">Terpakai vs Batas Pos</span>
+              <svg id="topBudgetChartArrow" class="arrow-toggle-ico collapsed" viewBox="0 0 24 24"><path d="M7 10l5 5 5-5H7z"/></svg>
+            </span>
+          </button>
+          <div id="topBudgetChart" class="chart-card collapsible-body hidden"></div>
         </div>
       </div>
 
@@ -982,17 +983,17 @@
         </div>
 
         <div class="card">
-          <button type="button" id="toggleRekapListBtn" class="collapse-bar" aria-expanded="true">
+          <button type="button" id="toggleRekapListBtn" class="collapse-bar" aria-expanded="false">
             <span class="collapse-bar-left">
               <svg class="ico" style="color:#38bdf8;" viewBox="0 0 24 24"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><circle cx="4" cy="6" r="1"/><circle cx="4" cy="12" r="1"/><circle cx="4" cy="18" r="1"/></svg>
               Daftar Pos Rekap Anggaran Bulan Ini
             </span>
             <span class="collapse-bar-right">
               <span id="rekapListCountBadge" class="badge badge-ok">0 Pos</span>
-              <svg id="rekapListArrow" class="arrow-toggle-ico" viewBox="0 0 24 24"><path d="M7 10l5 5 5-5H7z"/></svg>
+              <svg id="rekapListArrow" class="arrow-toggle-ico collapsed" viewBox="0 0 24 24"><path d="M7 10l5 5 5-5H7z"/></svg>
             </span>
           </button>
-          <div id="rekapList" class="collapsible-body"><p class="muted">Belum ada pos anggaran pada bulan ini.</p></div>
+          <div id="rekapList" class="collapsible-body hidden"><p class="muted">Belum ada pos anggaran pada bulan ini.</p></div>
         </div>
       </div>
 
@@ -1070,17 +1071,17 @@
         </div>
 
         <div class="card">
-          <button type="button" id="toggleDetailBreakdownBtn" class="collapse-bar" aria-expanded="true">
+          <button type="button" id="toggleDetailBreakdownBtn" class="collapse-bar" aria-expanded="false">
             <span class="collapse-bar-left">
               <svg class="ico" style="color:#38bdf8;" viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
               Rekap Pos & Detail Item Terpakai
             </span>
             <span class="collapse-bar-right">
               <span id="detailItemCountBadge" class="badge badge-ok">0 Item</span>
-              <svg id="detailBreakdownArrow" class="arrow-toggle-ico" viewBox="0 0 24 24"><path d="M7 10l5 5 5-5H7z"/></svg>
+              <svg id="detailBreakdownArrow" class="arrow-toggle-ico collapsed" viewBox="0 0 24 24"><path d="M7 10l5 5 5-5H7z"/></svg>
             </span>
           </button>
-          <div id="detailBreakdownList" class="collapsible-body"><p class="muted">Belum ada data pos atau item.</p></div>
+          <div id="detailBreakdownList" class="collapsible-body hidden"><p class="muted">Belum ada data pos atau item.</p></div>
         </div>
       </div>
     </div>
@@ -1246,6 +1247,10 @@
     const rangeStartMonthInput = document.getElementById("rangeStartMonth");
     const rangeEndMonthInput = document.getElementById("rangeEndMonth");
 
+    const toggleTopBudgetChartBtn = document.getElementById("toggleTopBudgetChartBtn");
+    const topChartEl = document.getElementById("topBudgetChart");
+    const topBudgetChartArrow = document.getElementById("topBudgetChartArrow");
+
     const toggleRekapListBtn = document.getElementById("toggleRekapListBtn");
     const rekapListEl = document.getElementById("rekapList");
     const rekapListArrow = document.getElementById("rekapListArrow");
@@ -1254,11 +1259,30 @@
     const detailEl = document.getElementById("detailBreakdownList");
     const detailBreakdownArrow = document.getElementById("detailBreakdownArrow");
 
+    const TOP_CHART_EXPAND_KEY = "ak_top_budget_chart_expanded_v1";
+    const REKAP_EXPAND_KEY = "ak_rekap_list_expanded_v1";
+    const DETAIL_EXPAND_KEY = "ak_detail_breakdown_expanded_v1";
+
     let editingBudgetDocId = null;
-    let isRekapListExpanded = true;
-    let isDetailBreakdownExpanded = true;
+    let isTopBudgetChartExpanded = false;
+    let isRekapListExpanded = false;
+    let isDetailBreakdownExpanded = false;
+
+    function applyInitialHiddenState() {
+      isTopBudgetChartExpanded = false;
+      isRekapListExpanded = false;
+      isDetailBreakdownExpanded = false;
+      localStorage.setItem(TOP_CHART_EXPAND_KEY, "false");
+      localStorage.setItem(REKAP_EXPAND_KEY, "false");
+      localStorage.setItem(DETAIL_EXPAND_KEY, "false");
+      syncCollapseUI();
+    }
 
     function syncCollapseUI() {
+      topChartEl.classList.toggle("hidden", !isTopBudgetChartExpanded);
+      toggleTopBudgetChartBtn.setAttribute("aria-expanded", String(isTopBudgetChartExpanded));
+      topBudgetChartArrow.classList.toggle("collapsed", !isTopBudgetChartExpanded);
+
       rekapListEl.classList.toggle("hidden", !isRekapListExpanded);
       toggleRekapListBtn.setAttribute("aria-expanded", String(isRekapListExpanded));
       rekapListArrow.classList.toggle("collapsed", !isRekapListExpanded);
@@ -1268,13 +1292,23 @@
       detailBreakdownArrow.classList.toggle("collapsed", !isDetailBreakdownExpanded);
     }
 
+    applyInitialHiddenState();
+
+    toggleTopBudgetChartBtn.addEventListener("click", () => {
+      isTopBudgetChartExpanded = !isTopBudgetChartExpanded;
+      localStorage.setItem(TOP_CHART_EXPAND_KEY, String(isTopBudgetChartExpanded));
+      syncCollapseUI();
+    });
+
     toggleRekapListBtn.addEventListener("click", () => {
       isRekapListExpanded = !isRekapListExpanded;
+      localStorage.setItem(REKAP_EXPAND_KEY, String(isRekapListExpanded));
       syncCollapseUI();
     });
 
     toggleDetailBreakdownBtn.addEventListener("click", () => {
       isDetailBreakdownExpanded = !isDetailBreakdownExpanded;
+      localStorage.setItem(DETAIL_EXPAND_KEY, String(isDetailBreakdownExpanded));
       syncCollapseUI();
     });
 
@@ -1945,13 +1979,11 @@
         </div>
       `;
 
-      const topChartEl = document.getElementById("topBudgetChart");
       if (!budgetsData.length) {
         topChartEl.innerHTML = `<p class="muted">Belum ada pos anggaran untuk digrafikkan.</p>`;
       } else {
         const sortedBudgets = [...budgetsData]
-          .sort((a, b) => (spentByBudget[b.id] || 0) - (spentByBudget[a.id] || 0))
-          .slice(0, 6);
+          .sort((a, b) => (spentByBudget[b.id] || 0) - (spentByBudget[a.id] || 0));
 
         topChartEl.innerHTML = sortedBudgets.map((b) => {
           const spent = spentByBudget[b.id] || 0;
