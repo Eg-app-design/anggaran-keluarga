@@ -289,6 +289,44 @@
     .badge-warn { background: var(--warn-soft); color: var(--warn); border: 1px solid rgba(245, 158, 11, 0.3); }
     .badge-danger { background: var(--danger-soft); color: var(--danger); border: 1px solid rgba(239, 68, 68, 0.3); }
 
+    .year-filter-group {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .year-filter-btn {
+      width: auto;
+      margin-top: 0;
+      padding: 3px 9px;
+      font-size: 0.68rem;
+      border-radius: 999px;
+      background: rgba(15, 23, 42, 0.9);
+      color: #cbd5e1;
+      border: 1px solid #334155;
+      font-weight: 700;
+      text-transform: none;
+      letter-spacing: 0.2px;
+      box-shadow: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .year-filter-btn:hover {
+      background: rgba(56, 189, 248, 0.14);
+      border-color: rgba(103, 232, 249, 0.55);
+      color: #67e8f9;
+      box-shadow: none;
+    }
+
+    .year-filter-btn.active {
+      background: rgba(6, 182, 212, 0.24);
+      color: #67e8f9;
+      border-color: rgba(103, 232, 249, 0.75);
+      box-shadow: 0 0 10px rgba(6, 182, 212, 0.25);
+    }
+
     label {
       display: block;
       font-size: 0.78rem;
@@ -458,7 +496,6 @@
     .bar-fill.warn { background: var(--warn); }
     .bar-fill.danger { background: var(--danger); }
 
-    /* Grafik Batang Bulanan di Tab Filter (ukuran sedang/ringkas) */
     .monthly-col-chart {
       display: flex;
       align-items: flex-end;
@@ -521,7 +558,6 @@
       white-space: nowrap;
     }
 
-    /* Grafik Pertahun 12 bulan penuh tanpa scroll ke samping + lingkaran persen */
     .yearly-full-strip {
       display: grid;
       grid-template-columns: repeat(12, 1fr);
@@ -911,16 +947,25 @@
           </div>
         </div>
 
-        <!-- GRAFIK PERTAHUN (1 TAHUN PENUH TANPA SCROLL KE SAMPING + LINGKARAN PERSEN) -->
+        <!-- GRAFIK PERTAHUN + TOMBOL FILTER TAHUN KE TAHUN (2025 & 2026) -->
         <div class="card">
           <div class="row-between">
             <h2 class="title-with-ico" style="margin-bottom:0;">
               <svg class="ico" style="color:#22d3ee;" viewBox="0 0 24 24"><path d="M21.21 15.89A10 10 0 1 1 8.11 2.99"/><path d="M22 12A10 10 0 0 0 12 2v10z"/></svg>
               Grafik Pertahun
             </h2>
-            <span id="yearlyChartYearLabel" class="badge badge-ok">2026</span>
+            <div class="year-filter-group">
+              <button type="button" id="toggle2025And2026Btn" class="year-filter-btn" aria-pressed="false" title="Filter gabungan tahun 2025 & 2026 (klik lagi untuk kembali ke pertahun)">
+                <svg class="ico" style="width:12px;height:12px;" viewBox="0 0 24 24"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
+                2025 & 2026
+              </button>
+              <button type="button" id="resetYearlyFilterBtn" class="year-filter-btn hidden" title="Kembali ke tampilan pertahun">
+                Pertahun
+              </button>
+              <span id="yearlyChartYearLabel" class="badge badge-ok">2026</span>
+            </div>
           </div>
-          <p class="muted" style="margin-top:4px;">Ringkasan pengeluaran 1 tahun penuh (Jan–Des) dengan proporsi persen.</p>
+          <p id="yearlyChartDesc" class="muted" style="margin-top:4px;">Ringkasan pengeluaran 1 tahun penuh (Jan–Des) dengan proporsi persen.</p>
           <div id="yearlyChartSection">
             <p class="muted" style="margin-top:6px;">Belum ada data pengeluaran tahun ini.</p>
           </div>
@@ -1341,6 +1386,9 @@
     const detailEl = document.getElementById("detailBreakdownList");
     const detailBreakdownArrow = document.getElementById("detailBreakdownArrow");
 
+    const toggle2025And2026Btn = document.getElementById("toggle2025And2026Btn");
+    const resetYearlyFilterBtn = document.getElementById("resetYearlyFilterBtn");
+
     const TOP_CHART_EXPAND_KEY = "ak_top_budget_chart_expanded_v1";
     const REKAP_EXPAND_KEY = "ak_rekap_list_expanded_v1";
     const DETAIL_EXPAND_KEY = "ak_detail_breakdown_expanded_v1";
@@ -1349,6 +1397,25 @@
     let isTopBudgetChartExpanded = false;
     let isRekapListExpanded = false;
     let isDetailBreakdownExpanded = false;
+    let is2025And2026FilterActive = false;
+
+    function syncYearlyFilterButtons() {
+      toggle2025And2026Btn.classList.toggle("active", is2025And2026FilterActive);
+      toggle2025And2026Btn.setAttribute("aria-pressed", String(is2025And2026FilterActive));
+      resetYearlyFilterBtn.classList.toggle("hidden", !is2025And2026FilterActive);
+    }
+
+    toggle2025And2026Btn.addEventListener("click", () => {
+      is2025And2026FilterActive = !is2025And2026FilterActive;
+      syncYearlyFilterButtons();
+      renderYearlyChart();
+    });
+
+    resetYearlyFilterBtn.addEventListener("click", () => {
+      is2025And2026FilterActive = false;
+      syncYearlyFilterButtons();
+      renderYearlyChart();
+    });
 
     function applyInitialHiddenState() {
       isTopBudgetChartExpanded = false;
@@ -1842,11 +1909,94 @@
     function renderYearlyChart() {
       const targetEl = document.getElementById("yearlyChartSection");
       const yearBadge = document.getElementById("yearlyChartYearLabel");
+      const descEl = document.getElementById("yearlyChartDesc");
       const activeYear = yearSelect.value || String(now.getFullYear());
-      yearBadge.textContent = activeYear;
 
       const monthTotals = Array(12).fill(0);
-      let yearTotal = 0;
+      let rangeTotal = 0;
+
+      if (is2025And2026FilterActive) {
+        yearBadge.textContent = "2025 & 2026";
+        descEl.textContent = "Gabungan pengeluaran tahun 2025 & 2026 (klik tombol lagi untuk kembali pertahun).";
+
+        let total2025 = 0;
+        let total2026 = 0;
+
+        for (const tx of allTxData) {
+          const ym = tx.month || (tx.date ? tx.date.slice(0, 7) : "");
+          const [yr, mStr] = ym.split("-");
+          if (yr !== "2025" && yr !== "2026") continue;
+          const mIdx = Number(mStr) - 1;
+          const amt = Number(tx.amount || 0);
+          if (yr === "2025") total2025 += amt;
+          if (yr === "2026") total2026 += amt;
+          if (mIdx >= 0 && mIdx < 12) {
+            monthTotals[mIdx] += amt;
+            rangeTotal += amt;
+          }
+        }
+
+        if (rangeTotal <= 0) {
+          targetEl.innerHTML = `<p class="muted" style="margin-top:6px;">Belum ada pengeluaran tercatat pada tahun 2025 & 2026.</p>`;
+          return;
+        }
+
+        const yearSlices = [
+          { label: "Tahun 2025", amt: total2025, pct: Math.round((total2025 / rangeTotal) * 100), color: "#22c55e" },
+          { label: "Tahun 2026", amt: total2026, pct: Math.round((total2026 / rangeTotal) * 100), color: "#06b6d4" }
+        ].filter((s) => s.amt > 0);
+
+        let currentDeg = 0;
+        const gradientStops = yearSlices.map((s) => {
+          const deg = (s.amt / rangeTotal) * 360;
+          const stop = `${s.color} ${currentDeg.toFixed(1)}deg ${(currentDeg + deg).toFixed(1)}deg`;
+          currentDeg += deg;
+          return stop;
+        });
+
+        const topPct = yearSlices[0] ? yearSlices[0].pct : 100;
+        const legendHtml = yearSlices.map((s) => `
+          <div class="row-between" style="font-size:0.75rem; padding:2px 0;">
+            <span class="muted"><span class="legend-dot" style="background:${s.color};"></span>${s.label}</span>
+            <strong>${s.pct}% <span class="muted">(${compactRupiah(s.amt)})</span></strong>
+          </div>
+        `).join("");
+
+        const maxBar = Math.max(...monthTotals, 1);
+        const stripHtml = monthTotals.map((amt, idx) => {
+          const mCode = pad(idx + 1);
+          const pct = Math.round((amt / rangeTotal) * 100);
+          const hPct = amt > 0 ? Math.max(12, Math.round((amt / maxBar) * 100)) : 0;
+          return `
+            <div class="yearly-m-col" title="${MONTH_SHORT_ID[mCode]} (2025–2026): ${rupiah(amt)} (${pct}%)">
+              <div class="yearly-m-pct">${pct > 0 ? pct + "%" : "0%"}</div>
+              <div class="yearly-m-track">
+                <div class="yearly-m-fill" style="height:${hPct}%;"></div>
+              </div>
+              <div class="yearly-m-lbl">${MONTH_SHORT_ID[mCode]}</div>
+            </div>
+          `;
+        }).join("");
+
+        targetEl.innerHTML = `
+          <div class="donut-wrap">
+            <div class="donut-ring" style="background: conic-gradient(${gradientStops.join(", ")});">
+              <div class="donut-hole">${topPct}%</div>
+            </div>
+            <div style="flex:1;">
+              <div style="font-size:0.78rem; font-weight:700; color:#f8fafc; margin-bottom:4px;">
+                Total 2025 & 2026: <span style="color:#67e8f9;">${rupiah(rangeTotal)}</span>
+              </div>
+              ${legendHtml}
+            </div>
+          </div>
+          <div class="yearly-full-strip" aria-label="Grafik 12 Bulan Penuh 2025 & 2026">${stripHtml}</div>
+        `;
+        return;
+      }
+
+      yearBadge.textContent = activeYear;
+      descEl.textContent = "Ringkasan pengeluaran 1 tahun penuh (Jan–Des) dengan proporsi persen.";
 
       for (const tx of allTxData) {
         const ym = tx.month || (tx.date ? tx.date.slice(0, 7) : "");
@@ -1855,11 +2005,11 @@
         const amt = Number(tx.amount || 0);
         if (mIdx >= 0 && mIdx < 12) {
           monthTotals[mIdx] += amt;
-          yearTotal += amt;
+          rangeTotal += amt;
         }
       }
 
-      if (yearTotal <= 0) {
+      if (rangeTotal <= 0) {
         targetEl.innerHTML = `<p class="muted" style="margin-top:6px;">Belum ada pengeluaran tercatat pada tahun ${activeYear}.</p>`;
         return;
       }
@@ -1869,7 +2019,7 @@
           mCode: pad(idx + 1),
           shortName: MONTH_SHORT_ID[pad(idx + 1)],
           amt,
-          pct: Math.round((amt / yearTotal) * 100)
+          pct: Math.round((amt / rangeTotal) * 100)
         }))
         .filter((item) => item.amt > 0)
         .sort((a, b) => b.amt - a.amt);
@@ -1877,7 +2027,7 @@
       let currentDeg = 0;
       const gradientStops = activeMonths.map((item, idx) => {
         const color = DONUT_COLORS[idx % DONUT_COLORS.length];
-        const deg = (item.amt / yearTotal) * 360;
+        const deg = (item.amt / rangeTotal) * 360;
         const stop = `${color} ${currentDeg.toFixed(1)}deg ${(currentDeg + deg).toFixed(1)}deg`;
         currentDeg += deg;
         item.color = color;
@@ -1895,7 +2045,7 @@
       const maxBar = Math.max(...monthTotals, 1);
       const stripHtml = monthTotals.map((amt, idx) => {
         const mCode = pad(idx + 1);
-        const pct = Math.round((amt / yearTotal) * 100);
+        const pct = Math.round((amt / rangeTotal) * 100);
         const hPct = amt > 0 ? Math.max(12, Math.round((amt / maxBar) * 100)) : 0;
         return `
           <div class="yearly-m-col" title="${MONTH_SHORT_ID[mCode]} ${activeYear}: ${rupiah(amt)} (${pct}%)">
@@ -1915,7 +2065,7 @@
           </div>
           <div style="flex:1;">
             <div style="font-size:0.78rem; font-weight:700; color:#f8fafc; margin-bottom:4px;">
-              Total ${activeYear}: <span style="color:#67e8f9;">${rupiah(yearTotal)}</span>
+              Total ${activeYear}: <span style="color:#67e8f9;">${rupiah(rangeTotal)}</span>
             </div>
             ${legendHtml}
           </div>
