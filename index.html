@@ -293,6 +293,7 @@
       display: inline-flex;
       align-items: center;
       gap: 5px;
+      flex-wrap: wrap;
     }
 
     .year-filter-btn {
@@ -325,6 +326,33 @@
       color: #67e8f9;
       border-color: rgba(103, 232, 249, 0.75);
       box-shadow: 0 0 10px rgba(6, 182, 212, 0.25);
+    }
+
+    .year-range-popover {
+      margin-top: 8px;
+      padding: 10px 12px;
+      background: rgba(2, 6, 23, 0.78);
+      border: 1px solid rgba(56, 189, 248, 0.35);
+      border-radius: 12px;
+    }
+
+    .year-range-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .year-range-select {
+      width: auto;
+      margin-top: 0;
+      padding: 5px 8px;
+      font-size: 0.76rem;
+      border-radius: 8px;
+      background: #0f172a;
+      color: #67e8f9;
+      border: 1px solid rgba(56, 189, 248, 0.4);
+      font-weight: 700;
     }
 
     label {
@@ -947,7 +975,7 @@
           </div>
         </div>
 
-        <!-- GRAFIK PERTAHUN + TOMBOL FILTER TAHUN KE TAHUN (2025 & 2026) -->
+        <!-- GRAFIK PERTAHUN + TOMBOL FILTER RENTANG TAHUN -->
         <div class="card">
           <div class="row-between">
             <h2 class="title-with-ico" style="margin-bottom:0;">
@@ -955,9 +983,13 @@
               Grafik Pertahun
             </h2>
             <div class="year-filter-group">
-              <button type="button" id="toggle2025And2026Btn" class="year-filter-btn" aria-pressed="false" title="Filter gabungan tahun 2025 & 2026 (klik lagi untuk kembali ke pertahun)">
+              <button type="button" id="toggle2025And2026Btn" class="year-filter-btn" aria-pressed="false" title="Filter cepat gabungan 2025 & 2026">
                 <svg class="ico" style="width:12px;height:12px;" viewBox="0 0 24 24"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
                 2025 & 2026
+              </button>
+              <button type="button" id="toggleYearRangeMenuBtn" class="year-filter-btn" aria-expanded="false" title="Atur rentang tahun bebas (misal 2025 - 2027)">
+                <svg class="ico" style="width:12px;height:12px;" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                Rentang
               </button>
               <button type="button" id="resetYearlyFilterBtn" class="year-filter-btn hidden" title="Kembali ke tampilan pertahun">
                 Pertahun
@@ -965,6 +997,17 @@
               <span id="yearlyChartYearLabel" class="badge badge-ok">2026</span>
             </div>
           </div>
+
+          <div id="yearRangePopover" class="year-range-popover hidden">
+            <div class="year-range-row">
+              <span class="muted" style="font-size:0.74rem; font-weight:700;">Dari:</span>
+              <select id="yearRangeStartSelect" class="year-range-select" aria-label="Tahun Awal"></select>
+              <span class="muted" style="font-size:0.74rem; font-weight:700;">s.d.</span>
+              <select id="yearRangeEndSelect" class="year-range-select" aria-label="Tahun Akhir"></select>
+              <button type="button" id="applyYearRangeBtn" class="small" style="padding:5px 10px; font-size:0.68rem;">Terapkan</button>
+            </div>
+          </div>
+
           <p id="yearlyChartDesc" class="muted" style="margin-top:4px;">Ringkasan pengeluaran 1 tahun penuh (Jan–Des) dengan proporsi persen.</p>
           <div id="yearlyChartSection">
             <p class="muted" style="margin-top:6px;">Belum ada data pengeluaran tahun ini.</p>
@@ -1387,6 +1430,11 @@
     const detailBreakdownArrow = document.getElementById("detailBreakdownArrow");
 
     const toggle2025And2026Btn = document.getElementById("toggle2025And2026Btn");
+    const toggleYearRangeMenuBtn = document.getElementById("toggleYearRangeMenuBtn");
+    const yearRangePopover = document.getElementById("yearRangePopover");
+    const yearRangeStartSelect = document.getElementById("yearRangeStartSelect");
+    const yearRangeEndSelect = document.getElementById("yearRangeEndSelect");
+    const applyYearRangeBtn = document.getElementById("applyYearRangeBtn");
     const resetYearlyFilterBtn = document.getElementById("resetYearlyFilterBtn");
 
     const TOP_CHART_EXPAND_KEY = "ak_top_budget_chart_expanded_v1";
@@ -1397,22 +1445,88 @@
     let isTopBudgetChartExpanded = false;
     let isRekapListExpanded = false;
     let isDetailBreakdownExpanded = false;
-    let is2025And2026FilterActive = false;
+
+    // Mode filter grafik tahun:
+    // null = Pertahun normal (1 tahun penuh sesuai yearSelect)
+    // { start: "2025", end: "2026" } = gabungan 2025 & 2026
+    // { start: "2025", end: "2027" } = gabungan rentang bebas
+    let activeYearRangeFilter = null;
+    let isYearRangeMenuOpen = false;
+
+    function populateYearRangeDropdowns() {
+      const years = [...yearSelect.options].map((o) => o.value);
+      const optionsHtml = years.map((y) => `<option value="${y}">${y}</option>`).join("");
+      yearRangeStartSelect.innerHTML = optionsHtml;
+      yearRangeEndSelect.innerHTML = optionsHtml;
+      yearRangeStartSelect.value = years.includes("2025") ? "2025" : (years[0] || "2025");
+      yearRangeEndSelect.value = years.includes("2027") ? "2027" : (years[years.length - 1] || "2026");
+    }
+    populateYearRangeDropdowns();
 
     function syncYearlyFilterButtons() {
-      toggle2025And2026Btn.classList.toggle("active", is2025And2026FilterActive);
-      toggle2025And2026Btn.setAttribute("aria-pressed", String(is2025And2026FilterActive));
-      resetYearlyFilterBtn.classList.toggle("hidden", !is2025And2026FilterActive);
+      const is2025To2026 = Boolean(
+        activeYearRangeFilter &&
+        activeYearRangeFilter.start === "2025" &&
+        activeYearRangeFilter.end === "2026"
+      );
+      const isCustomRange = Boolean(activeYearRangeFilter && !is2025To2026);
+
+      toggle2025And2026Btn.classList.toggle("active", is2025To2026);
+      toggle2025And2026Btn.setAttribute("aria-pressed", String(is2025To2026));
+
+      toggleYearRangeMenuBtn.classList.toggle("active", isCustomRange || isYearRangeMenuOpen);
+      toggleYearRangeMenuBtn.setAttribute("aria-expanded", String(isYearRangeMenuOpen));
+      yearRangePopover.classList.toggle("hidden", !isYearRangeMenuOpen);
+
+      resetYearlyFilterBtn.classList.toggle("hidden", !activeYearRangeFilter);
     }
 
     toggle2025And2026Btn.addEventListener("click", () => {
-      is2025And2026FilterActive = !is2025And2026FilterActive;
+      const isAlready2025To2026 = Boolean(
+        activeYearRangeFilter &&
+        activeYearRangeFilter.start === "2025" &&
+        activeYearRangeFilter.end === "2026"
+      );
+      if (isAlready2025To2026) {
+        activeYearRangeFilter = null;
+      } else {
+        activeYearRangeFilter = { start: "2025", end: "2026" };
+        yearRangeStartSelect.value = "2025";
+        yearRangeEndSelect.value = "2026";
+      }
+      isYearRangeMenuOpen = false;
+      syncYearlyFilterButtons();
+      renderYearlyChart();
+    });
+
+    toggleYearRangeMenuBtn.addEventListener("click", () => {
+      isYearRangeMenuOpen = !isYearRangeMenuOpen;
+      if (isYearRangeMenuOpen && activeYearRangeFilter) {
+        yearRangeStartSelect.value = activeYearRangeFilter.start;
+        yearRangeEndSelect.value = activeYearRangeFilter.end;
+      }
+      syncYearlyFilterButtons();
+    });
+
+    applyYearRangeBtn.addEventListener("click", () => {
+      let yStart = Number(yearRangeStartSelect.value);
+      let yEnd = Number(yearRangeEndSelect.value);
+      if (yStart > yEnd) {
+        const tmp = yStart;
+        yStart = yEnd;
+        yEnd = tmp;
+      }
+      yearRangeStartSelect.value = String(yStart);
+      yearRangeEndSelect.value = String(yEnd);
+      activeYearRangeFilter = { start: String(yStart), end: String(yEnd) };
+      isYearRangeMenuOpen = false;
       syncYearlyFilterButtons();
       renderYearlyChart();
     });
 
     resetYearlyFilterBtn.addEventListener("click", () => {
-      is2025And2026FilterActive = false;
+      activeYearRangeFilter = null;
+      isYearRangeMenuOpen = false;
       syncYearlyFilterButtons();
       renderYearlyChart();
     });
@@ -1494,6 +1608,7 @@
         opt.value = y;
         opt.textContent = y;
         yearSelect.appendChild(opt);
+        populateYearRangeDropdowns();
       }
       yearSelect.value = y;
       monthSelect.value = m;
@@ -1915,21 +2030,26 @@
       const monthTotals = Array(12).fill(0);
       let rangeTotal = 0;
 
-      if (is2025And2026FilterActive) {
-        yearBadge.textContent = "2025 & 2026";
-        descEl.textContent = "Gabungan pengeluaran tahun 2025 & 2026 (klik tombol lagi untuk kembali pertahun).";
+      if (activeYearRangeFilter) {
+        const yStartNum = Number(activeYearRangeFilter.start);
+        const yEndNum = Number(activeYearRangeFilter.end);
+        const labelText = yStartNum === yEndNum ? String(yStartNum) : `${yStartNum} - ${yEndNum}`;
+        yearBadge.textContent = labelText;
+        descEl.textContent = `Gabungan pengeluaran tahun ${labelText} (klik Pertahun untuk kembali).`;
 
-        let total2025 = 0;
-        let total2026 = 0;
+        const perYearTotals = {};
+        for (let y = yStartNum; y <= yEndNum; y += 1) {
+          perYearTotals[String(y)] = 0;
+        }
 
         for (const tx of allTxData) {
           const ym = tx.month || (tx.date ? tx.date.slice(0, 7) : "");
           const [yr, mStr] = ym.split("-");
-          if (yr !== "2025" && yr !== "2026") continue;
+          const yrNum = Number(yr);
+          if (!yr || Number.isNaN(yrNum) || yrNum < yStartNum || yrNum > yEndNum) continue;
           const mIdx = Number(mStr) - 1;
           const amt = Number(tx.amount || 0);
-          if (yr === "2025") total2025 += amt;
-          if (yr === "2026") total2026 += amt;
+          perYearTotals[yr] = (perYearTotals[yr] || 0) + amt;
           if (mIdx >= 0 && mIdx < 12) {
             monthTotals[mIdx] += amt;
             rangeTotal += amt;
@@ -1937,14 +2057,19 @@
         }
 
         if (rangeTotal <= 0) {
-          targetEl.innerHTML = `<p class="muted" style="margin-top:6px;">Belum ada pengeluaran tercatat pada tahun 2025 & 2026.</p>`;
+          targetEl.innerHTML = `<p class="muted" style="margin-top:6px;">Belum ada pengeluaran tercatat pada tahun ${labelText}.</p>`;
           return;
         }
 
-        const yearSlices = [
-          { label: "Tahun 2025", amt: total2025, pct: Math.round((total2025 / rangeTotal) * 100), color: "#22c55e" },
-          { label: "Tahun 2026", amt: total2026, pct: Math.round((total2026 / rangeTotal) * 100), color: "#06b6d4" }
-        ].filter((s) => s.amt > 0);
+        const yearSlices = Object.entries(perYearTotals)
+          .filter(([, amt]) => amt > 0)
+          .map(([yr, amt], idx) => ({
+            label: `Tahun ${yr}`,
+            amt,
+            pct: Math.round((amt / rangeTotal) * 100),
+            color: DONUT_COLORS[idx % DONUT_COLORS.length]
+          }))
+          .sort((a, b) => b.amt - a.amt);
 
         let currentDeg = 0;
         const gradientStops = yearSlices.map((s) => {
@@ -1955,7 +2080,7 @@
         });
 
         const topPct = yearSlices[0] ? yearSlices[0].pct : 100;
-        const legendHtml = yearSlices.map((s) => `
+        const legendHtml = yearSlices.slice(0, 5).map((s) => `
           <div class="row-between" style="font-size:0.75rem; padding:2px 0;">
             <span class="muted"><span class="legend-dot" style="background:${s.color};"></span>${s.label}</span>
             <strong>${s.pct}% <span class="muted">(${compactRupiah(s.amt)})</span></strong>
@@ -1968,7 +2093,7 @@
           const pct = Math.round((amt / rangeTotal) * 100);
           const hPct = amt > 0 ? Math.max(12, Math.round((amt / maxBar) * 100)) : 0;
           return `
-            <div class="yearly-m-col" title="${MONTH_SHORT_ID[mCode]} (2025–2026): ${rupiah(amt)} (${pct}%)">
+            <div class="yearly-m-col" title="${MONTH_SHORT_ID[mCode]} (${labelText}): ${rupiah(amt)} (${pct}%)">
               <div class="yearly-m-pct">${pct > 0 ? pct + "%" : "0%"}</div>
               <div class="yearly-m-track">
                 <div class="yearly-m-fill" style="height:${hPct}%;"></div>
@@ -1985,12 +2110,12 @@
             </div>
             <div style="flex:1;">
               <div style="font-size:0.78rem; font-weight:700; color:#f8fafc; margin-bottom:4px;">
-                Total 2025 & 2026: <span style="color:#67e8f9;">${rupiah(rangeTotal)}</span>
+                Total ${labelText}: <span style="color:#67e8f9;">${rupiah(rangeTotal)}</span>
               </div>
               ${legendHtml}
             </div>
           </div>
-          <div class="yearly-full-strip" aria-label="Grafik 12 Bulan Penuh 2025 & 2026">${stripHtml}</div>
+          <div class="yearly-full-strip" aria-label="Grafik 12 Bulan Penuh ${labelText}">${stripHtml}</div>
         `;
         return;
       }
