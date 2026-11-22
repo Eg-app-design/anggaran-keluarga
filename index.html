@@ -48,8 +48,8 @@
     }
 
     .ico {
-      width: 16px;
-      height: 16px;
+      width: 15px;
+      height: 15px;
       flex-shrink: 0;
       stroke: currentColor;
       fill: none;
@@ -394,8 +394,8 @@
 
     .nav-tabs {
       display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 5px;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 4px;
       margin-bottom: 12px;
       background: rgba(15, 23, 42, 0.85);
       border: 1px solid var(--border);
@@ -405,8 +405,8 @@
 
     .tab-btn {
       margin-top: 0;
-      padding: 9px 4px;
-      font-size: 0.7rem;
+      padding: 9px 2px;
+      font-size: 0.65rem;
       border-radius: 10px;
       background: transparent;
       color: var(--muted);
@@ -415,7 +415,9 @@
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      gap: 4px;
+      gap: 3px;
+      white-space: nowrap;
+      letter-spacing: 0.1px;
     }
 
     .tab-btn.active {
@@ -766,7 +768,7 @@
         <div id="statusMsg"></div>
       </div>
 
-      <!-- MENU NAVIGASI 4 TAB -->
+      <!-- MENU NAVIGASI 5 TAB: DASHBOARD, CATAT, REKAP, ITEM, FILTER -->
       <div class="nav-tabs">
         <button type="button" class="tab-btn active" data-tab="tabDashboard">
           <svg class="ico" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></svg>
@@ -780,9 +782,13 @@
           <svg class="ico" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="13" y2="17"/></svg>
           Rekap
         </button>
-        <button type="button" class="tab-btn" data-tab="tabItemFilter">
+        <button type="button" class="tab-btn" data-tab="tabItem">
+          <svg class="ico" viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
+          Item
+        </button>
+        <button type="button" class="tab-btn" data-tab="tabFilter">
           <svg class="ico" viewBox="0 0 24 24"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
-          Item Filter
+          Filter
         </button>
       </div>
 
@@ -853,7 +859,7 @@
             </h2>
             <span id="monthlyBarRangeLabel" class="muted">Rentang Filter</span>
           </div>
-          <p class="muted" style="margin-top:4px;">Perbandingan total pengeluaran antarbulan (sinkron dengan rentang di tab <strong>Item Filter</strong>).</p>
+          <p class="muted" style="margin-top:4px;">Perbandingan total pengeluaran antarbulan (sinkron dengan rentang di tab <strong>Filter</strong>).</p>
           <div id="monthlyColumnChart" class="monthly-col-chart">
             <p class="muted">Belum ada data bulan untuk digrafikkan.</p>
           </div>
@@ -997,9 +1003,45 @@
         </div>
       </div>
 
-      <!-- TAB 4: ITEM FILTER (FILTER BEBERAPA BULAN + RINCIAN ITEM) -->
-      <div id="tabItemFilter" class="hidden">
-        <!-- FILTER PENGELUARAN BEBERAPA BULAN -->
+      <!-- TAB 4: ITEM (RINCIAN ITEM DALAM POS ANGGARAN) -->
+      <div id="tabItem" class="hidden">
+        <div class="card">
+          <h2 class="title-with-ico">
+            <svg class="ico" style="color:#22c55e;" viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
+            Tambah List Detail Item dalam Pos
+          </h2>
+          <p class="muted">Contoh: pilih pos <strong style="color:#67e8f9;">Belanja Bulanan</strong>, lalu tambahkan rincian seperti <em>Beras</em>, <em>Minyak goreng</em>, dan <em>Telur</em>.</p>
+          <form id="subItemForm">
+            <label for="subTargetBudget">Pilih Pos Anggaran Induk</label>
+            <select id="subTargetBudget" required></select>
+
+            <label for="subItemName">Nama Detail Item</label>
+            <input type="text" id="subItemName" required placeholder="Contoh: Beras / Minyak goreng / Telur" />
+
+            <label for="subItemLimit">Alokasi Anggaran Item (Rp)</label>
+            <input type="number" id="subItemLimit" min="0" step="1000" required placeholder="Contoh: 150000" />
+
+            <button type="submit">Tambah Detail Item</button>
+          </form>
+        </div>
+
+        <div class="card">
+          <button type="button" id="toggleDetailBreakdownBtn" class="collapse-bar" aria-expanded="false">
+            <span class="collapse-bar-left">
+              <svg class="ico" style="color:#38bdf8;" viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+              Rekap Pos & Detail Item Terpakai
+            </span>
+            <span class="collapse-bar-right">
+              <span id="detailItemCountBadge" class="badge badge-ok">0 Item</span>
+              <svg id="detailBreakdownArrow" class="arrow-toggle-ico collapsed" viewBox="0 0 24 24"><path d="M7 10l5 5 5-5H7z"/></svg>
+            </span>
+          </button>
+          <div id="detailBreakdownList" class="collapsible-body hidden"><p class="muted">Belum ada data pos atau item.</p></div>
+        </div>
+      </div>
+
+      <!-- TAB 5: FILTER (FILTER PENGELUARAN BEBERAPA BULAN) -->
+      <div id="tabFilter" class="hidden">
         <div class="card">
           <div class="row-between">
             <h2 class="title-with-ico" style="margin-bottom:0;">
@@ -1047,41 +1089,6 @@
 
             <div id="rangeBreakdownList" style="margin-top:10px;"></div>
           </div>
-        </div>
-
-        <!-- RINCIAN ITEM DALAM POS ANGGARAN -->
-        <div class="card">
-          <h2 class="title-with-ico">
-            <svg class="ico" style="color:#22c55e;" viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
-            Tambah List Detail Item dalam Pos
-          </h2>
-          <p class="muted">Contoh: pilih pos <strong style="color:#67e8f9;">Belanja Bulanan</strong>, lalu tambahkan rincian seperti <em>Beras</em>, <em>Minyak goreng</em>, dan <em>Telur</em>.</p>
-          <form id="subItemForm">
-            <label for="subTargetBudget">Pilih Pos Anggaran Induk</label>
-            <select id="subTargetBudget" required></select>
-
-            <label for="subItemName">Nama Detail Item</label>
-            <input type="text" id="subItemName" required placeholder="Contoh: Beras / Minyak goreng / Telur" />
-
-            <label for="subItemLimit">Alokasi Anggaran Item (Rp)</label>
-            <input type="number" id="subItemLimit" min="0" step="1000" required placeholder="Contoh: 150000" />
-
-            <button type="submit">Tambah Detail Item</button>
-          </form>
-        </div>
-
-        <div class="card">
-          <button type="button" id="toggleDetailBreakdownBtn" class="collapse-bar" aria-expanded="false">
-            <span class="collapse-bar-left">
-              <svg class="ico" style="color:#38bdf8;" viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
-              Rekap Pos & Detail Item Terpakai
-            </span>
-            <span class="collapse-bar-right">
-              <span id="detailItemCountBadge" class="badge badge-ok">0 Item</span>
-              <svg id="detailBreakdownArrow" class="arrow-toggle-ico collapsed" viewBox="0 0 24 24"><path d="M7 10l5 5 5-5H7z"/></svg>
-            </span>
-          </button>
-          <div id="detailBreakdownList" class="collapsible-body hidden"><p class="muted">Belum ada data pos atau item.</p></div>
         </div>
       </div>
     </div>
@@ -1438,7 +1445,7 @@
         document.querySelectorAll(".tab-btn").forEach((b) => b.classList.remove("active"));
         btn.classList.add("active");
         const target = btn.getAttribute("data-tab");
-        ["tabDashboard", "tabCatat", "tabRekap", "tabItemFilter"].forEach((id) => {
+        ["tabDashboard", "tabCatat", "tabRekap", "tabItem", "tabFilter"].forEach((id) => {
           document.getElementById(id).classList.toggle("hidden", id !== target);
         });
       });
@@ -1761,7 +1768,7 @@
 
       if (!monthsList.length) {
         labelEl.textContent = "0 Bulan";
-        chartEl.innerHTML = `<p class="muted">Pilih rentang bulan pada tab Item Filter.</p>`;
+        chartEl.innerHTML = `<p class="muted">Pilih rentang bulan pada tab Filter.</p>`;
         return;
       }
 
