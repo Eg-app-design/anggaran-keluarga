@@ -47,6 +47,28 @@
       padding: 12px;
     }
 
+    .ico {
+      width: 16px;
+      height: 16px;
+      flex-shrink: 0;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .ico-lg {
+      width: 22px;
+      height: 22px;
+    }
+
+    .title-with-ico {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+    }
+
     .hero-header {
       background: linear-gradient(135deg, rgba(13, 148, 136, 0.28) 0%, rgba(6, 182, 212, 0.18) 55%, rgba(15, 23, 42, 0.9) 100%);
       color: var(--text);
@@ -58,8 +80,27 @@
       box-shadow: 0 0 24px rgba(6, 182, 212, 0.12);
     }
 
+    .hero-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .hero-icon-badge {
+      width: 38px;
+      height: 38px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(6, 182, 212, 0.18);
+      border: 1px solid rgba(103, 232, 249, 0.45);
+      color: #67e8f9;
+      flex-shrink: 0;
+    }
+
     .hero-header h1 {
-      font-size: 1.25rem;
+      font-size: 1.2rem;
       font-weight: 800;
       letter-spacing: -0.2px;
       background: linear-gradient(90deg, #ffffff, #67e8f9);
@@ -68,7 +109,7 @@
     }
 
     .hero-sub {
-      font-size: 0.78rem;
+      font-size: 0.76rem;
       color: var(--muted);
       margin-top: 2px;
     }
@@ -83,14 +124,17 @@
     .ghost-btn {
       width: auto;
       margin-top: 0;
-      padding: 6px 13px;
-      font-size: 0.76rem;
+      padding: 6px 12px;
+      font-size: 0.74rem;
       border-radius: 999px;
       background: rgba(15, 23, 42, 0.75);
       color: var(--accent-blue);
       border: 1px solid rgba(56, 189, 248, 0.4);
       text-transform: uppercase;
       letter-spacing: 0.4px;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
     }
 
     .ghost-btn:hover {
@@ -108,7 +152,7 @@
     }
 
     h2 {
-      font-size: 0.92rem;
+      font-size: 0.9rem;
       margin-bottom: 10px;
       color: var(--text);
       font-weight: 700;
@@ -151,9 +195,12 @@
     }
 
     .stat-label {
-      font-size: 0.72rem;
+      font-size: 0.71rem;
       color: var(--muted);
       font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 5px;
     }
 
     .stat-val {
@@ -168,7 +215,9 @@
     .danger { color: var(--danger); }
 
     .badge {
-      display: inline-block;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
       padding: 2px 9px;
       border-radius: 999px;
       font-size: 0.72rem;
@@ -264,6 +313,9 @@
       font-size: 0.72rem;
       margin-top: 0;
       border-radius: 9px;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
     }
 
     .quick-months {
@@ -276,13 +328,13 @@
     .quick-months button {
       margin-top: 0;
       padding: 7px 6px;
-      font-size: 0.72rem;
+      font-size: 0.7rem;
     }
 
     .nav-tabs {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
-      gap: 6px;
+      gap: 5px;
       margin-bottom: 12px;
       background: rgba(15, 23, 42, 0.85);
       border: 1px solid var(--border);
@@ -292,13 +344,17 @@
 
     .tab-btn {
       margin-top: 0;
-      padding: 9px 6px;
-      font-size: 0.74rem;
+      padding: 9px 4px;
+      font-size: 0.7rem;
       border-radius: 10px;
       background: transparent;
       color: var(--muted);
       font-weight: 700;
       border: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
     }
 
     .tab-btn.active {
@@ -338,6 +394,69 @@
     .bar-fill.teal { background: #14b8a6; }
     .bar-fill.warn { background: var(--warn); }
     .bar-fill.danger { background: var(--danger); }
+
+    /* Grafik Batang Bulanan */
+    .monthly-col-chart {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 8px;
+      height: 138px;
+      padding: 12px 10px 8px;
+      background: rgba(2, 6, 23, 0.65);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      margin-top: 10px;
+      overflow-x: auto;
+    }
+
+    .monthly-col-item {
+      flex: 1;
+      min-width: 52px;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 5px;
+    }
+
+    .monthly-col-val {
+      font-size: 0.65rem;
+      font-weight: 700;
+      color: #67e8f9;
+      text-align: center;
+      white-space: nowrap;
+    }
+
+    .monthly-col-track {
+      width: 100%;
+      max-width: 34px;
+      height: 82px;
+      background: #1e293b;
+      border-radius: 8px 8px 4px 4px;
+      display: flex;
+      align-items: flex-end;
+      overflow: hidden;
+      border: 1px solid rgba(56, 189, 248, 0.2);
+    }
+
+    .monthly-col-fill {
+      width: 100%;
+      background: linear-gradient(180deg, #22d3ee 0%, #0d9488 100%);
+      border-radius: 6px 6px 2px 2px;
+      min-height: 4px;
+      transition: height 0.35s ease;
+      box-shadow: 0 0 10px rgba(34, 211, 238, 0.25);
+    }
+
+    .monthly-col-label {
+      font-size: 0.68rem;
+      font-weight: 700;
+      color: var(--muted);
+      text-align: center;
+      white-space: nowrap;
+    }
 
     .sub-box {
       background: var(--soft);
@@ -417,6 +536,19 @@
 
     .tx-item:first-child { border-top: none; }
 
+    .tx-icon-box {
+      width: 32px;
+      height: 32px;
+      border-radius: 10px;
+      background: rgba(6, 182, 212, 0.12);
+      border: 1px solid rgba(6, 182, 212, 0.3);
+      color: #67e8f9;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
     .donut-wrap {
       display: flex;
       align-items: center;
@@ -459,8 +591,15 @@
   <div class="container">
     <!-- LOGIN -->
     <div id="authSection" class="card" style="margin-top:24px;">
-      <h1 style="font-size:1.3rem; color:#67e8f9; margin-bottom:4px;">Anggaran Keluarga</h1>
-      <p class="muted">Masuk menggunakan akun keluarga di Firebase Authentication.</p>
+      <div class="hero-brand" style="margin-bottom:8px;">
+        <div class="hero-icon-badge">
+          <svg class="ico ico-lg" viewBox="0 0 24 24"><path d="M3 10.5L12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1v-9.5z"/></svg>
+        </div>
+        <div>
+          <h1 style="font-size:1.25rem; color:#67e8f9;">Anggaran Keluarga</h1>
+          <p class="muted">Masuk menggunakan akun keluarga di Firebase Authentication.</p>
+        </div>
+      </div>
       <form id="loginForm">
         <label for="loginEmail">Email</label>
         <input type="email" id="loginEmail" required placeholder="nama@email.com" />
@@ -476,17 +615,28 @@
       <!-- HEADER & PENGATURAN BULAN + GAJI -->
       <div class="hero-header">
         <div class="hero-top">
-          <div>
-            <h1>Anggaran Keluarga</h1>
-            <div id="userInfo" class="hero-sub"></div>
+          <div class="hero-brand">
+            <div class="hero-icon-badge">
+              <svg class="ico ico-lg" viewBox="0 0 24 24"><path d="M3 10.5L12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1v-9.5z"/></svg>
+            </div>
+            <div>
+              <h1>Anggaran Keluarga</h1>
+              <div id="userInfo" class="hero-sub"></div>
+            </div>
           </div>
-          <button type="button" id="logoutBtn" class="ghost-btn">Keluar</button>
+          <button type="button" id="logoutBtn" class="ghost-btn">
+            <svg class="ico" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+            Keluar
+          </button>
         </div>
       </div>
 
       <div class="card">
         <div class="row-between">
-          <span style="font-size:0.78rem; font-weight:700; color:#67e8f9; text-transform:uppercase; letter-spacing:0.5px;">Periode Bulan</span>
+          <span class="title-with-ico" style="font-size:0.78rem; font-weight:700; color:#67e8f9; text-transform:uppercase; letter-spacing:0.5px;">
+            <svg class="ico" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            Periode Bulan
+          </span>
           <span id="monthBadge" class="badge badge-ok">Aktif</span>
         </div>
         <div class="grid-2" style="margin-top:6px;">
@@ -520,10 +670,19 @@
         <!-- GAJI / PEMASUKAN BISA DIEDIT & DI-CLEAR -->
         <div class="sub-box">
           <div class="row-between">
-            <span style="font-size:0.8rem; font-weight:700; color:#cbd5e1;">Gaji / Pemasukan Bulan Ini</span>
+            <span class="title-with-ico" style="font-size:0.8rem; font-weight:700; color:#cbd5e1;">
+              <svg class="ico" style="color:#22c55e;" viewBox="0 0 24 24"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2.5"/><path d="M6 12h.01M18 12h.01"/></svg>
+              Gaji / Pemasukan Bulan Ini
+            </span>
             <div style="display:flex; gap:6px;">
-              <button type="button" id="toggleIncomeEditBtn" class="secondary small">Edit Gaji</button>
-              <button type="button" id="clearIncomeBtn" class="danger-btn small">Clear</button>
+              <button type="button" id="toggleIncomeEditBtn" class="secondary small">
+                <svg class="ico" viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+                Edit Gaji
+              </button>
+              <button type="button" id="clearIncomeBtn" class="danger-btn small">
+                <svg class="ico" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/></svg>
+                Clear
+              </button>
             </div>
           </div>
           <div id="incomeValueText" style="font-size:1.25rem; font-weight:800; margin-top:4px; color:#22c55e;">
@@ -549,27 +708,48 @@
 
       <!-- MENU NAVIGASI 4 TAB -->
       <div class="nav-tabs">
-        <button type="button" class="tab-btn active" data-tab="tabDashboard">Dashboard</button>
-        <button type="button" class="tab-btn" data-tab="tabCatat">Catat</button>
-        <button type="button" class="tab-btn" data-tab="tabRekap">Rekap</button>
-        <button type="button" class="tab-btn" data-tab="tabRincian">Item</button>
+        <button type="button" class="tab-btn active" data-tab="tabDashboard">
+          <svg class="ico" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></svg>
+          Dashboard
+        </button>
+        <button type="button" class="tab-btn" data-tab="tabCatat">
+          <svg class="ico" viewBox="0 0 24 24"><path d="M12 5v14"/><path d="M5 12h14"/></svg>
+          Catat
+        </button>
+        <button type="button" class="tab-btn" data-tab="tabRekap">
+          <svg class="ico" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="13" y2="17"/></svg>
+          Rekap
+        </button>
+        <button type="button" class="tab-btn" data-tab="tabFilter">
+          <svg class="ico" viewBox="0 0 24 24"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
+          Filter
+        </button>
       </div>
 
       <!-- TAB 1: DASHBOARD -->
       <div id="tabDashboard">
         <div class="card">
-          <h2>Ringkasan Anggaran & Pengeluaran</h2>
+          <h2 class="title-with-ico">
+            <svg class="ico" style="color:#67e8f9;" viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+            Ringkasan Anggaran & Pengeluaran
+          </h2>
 
           <div class="grid-2">
             <div class="stat-box">
-              <div class="stat-label">List Sesuai Bulanan</div>
+              <div class="stat-label">
+                <svg class="ico" style="color:#67e8f9;" viewBox="0 0 24 24"><path d="M4 6h16"/><path d="M4 12h16"/><path d="M4 18h10"/></svg>
+                List Sesuai Bulanan
+              </div>
               <div id="posCountDisplay" class="stat-val" style="color:#67e8f9;">0 Pos</div>
             </div>
 
             <div class="stat-box">
               <div class="row-between">
-                <span class="stat-label">Total Anggaran</span>
-                <button type="button" id="toggleBudgetEditBtn" class="secondary small" style="padding:2px 7px; font-size:0.68rem;">Edit</button>
+                <span class="stat-label">
+                  <svg class="ico" style="color:#38bdf8;" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v10"/><path d="M9.5 9.5a2.5 2.5 0 0 1 5 0c0 2.5-5 2.5-5 5a2.5 2.5 0 0 0 5 0"/></svg>
+                  Total Anggaran
+                </span>
+                <button type="button" id="toggleBudgetEditBtn" class="secondary small" style="padding:2px 7px; font-size:0.66rem;">Edit</button>
               </div>
               <div id="totalBudgetDisplay" class="stat-val" style="color:#38bdf8;">Rp0</div>
             </div>
@@ -604,10 +784,28 @@
           </div>
         </div>
 
+        <!-- GRAFIK BATANG BULANAN -->
+        <div class="card">
+          <div class="row-between">
+            <h2 class="title-with-ico" style="margin-bottom:0;">
+              <svg class="ico" style="color:#22d3ee;" viewBox="0 0 24 24"><rect x="3" y="12" width="4" height="8" rx="1"/><rect x="10" y="7" width="4" height="13" rx="1"/><rect x="17" y="4" width="4" height="16" rx="1"/></svg>
+              Grafik Batang Bulanan
+            </h2>
+            <span id="monthlyBarRangeLabel" class="muted">Rentang Filter</span>
+          </div>
+          <p class="muted" style="margin-top:4px;">Perbandingan total pengeluaran antarbulan (sinkron dengan rentang di tab <strong>Filter</strong>).</p>
+          <div id="monthlyColumnChart" class="monthly-col-chart">
+            <p class="muted">Belum ada data bulan untuk digrafikkan.</p>
+          </div>
+        </div>
+
         <!-- GRAFIK PROPORSI KATEGORI PENGELUARAN (DONUT CHART) -->
         <div class="card">
           <div class="row-between">
-            <h2 style="margin-bottom:0;">Proporsi Kategori Pengeluaran</h2>
+            <h2 class="title-with-ico" style="margin-bottom:0;">
+              <svg class="ico" style="color:#22c55e;" viewBox="0 0 24 24"><path d="M21.21 15.89A10 10 0 1 1 8.11 2.99"/><path d="M22 12A10 10 0 0 0 12 2v10z"/></svg>
+              Proporsi Kategori Pengeluaran
+            </h2>
             <span class="muted">Bulan Ini</span>
           </div>
           <div id="categoryDonutSection">
@@ -615,55 +813,22 @@
           </div>
         </div>
 
-        <!-- FILTER PENGELUARAN BEBERAPA BULAN -->
+        <!-- GRAFIK RINGKASAN BULAN INI -->
         <div class="card">
-          <div class="row-between">
-            <h2 style="margin-bottom:0;">Filter Pengeluaran Beberapa Bulan</h2>
-            <span id="rangeCountBadge" class="badge badge-ok">0 Bulan</span>
-          </div>
-          <p class="muted" style="margin-top:4px;">Pilih rentang bulan untuk mengetahui total keuangan yang sudah dikeluarkan.</p>
-
-          <div class="month-range-box">
-            <div class="grid-2" style="margin-top:0;">
-              <div>
-                <label for="rangeStartMonth" style="margin-top:0;">Dari Bulan</label>
-                <input type="month" id="rangeStartMonth" />
-              </div>
-              <div>
-                <label for="rangeEndMonth" style="margin-top:0;">Sampai Bulan</label>
-                <input type="month" id="rangeEndMonth" />
-              </div>
-            </div>
-
-            <div class="quick-months">
-              <button type="button" id="last3MonthsBtn" class="secondary">3 Bulan Terakhir</button>
-              <button type="button" id="last6MonthsBtn" class="secondary">6 Bulan Terakhir</button>
-              <button type="button" id="syncActiveMonthBtn" class="secondary">Bulan Aktif Saja</button>
-            </div>
-
-            <div class="grid-2" style="margin-top:10px;">
-              <div class="stat-box">
-                <div class="stat-label">Total Pengeluaran Rentang</div>
-                <div id="rangeTotalSpentDisplay" class="stat-val danger">Rp0</div>
-              </div>
-              <div class="stat-box">
-                <div class="stat-label">Rata-Rata per Bulan</div>
-                <div id="rangeAvgSpentDisplay" class="stat-val" style="color:#67e8f9;">Rp0</div>
-              </div>
-            </div>
-
-            <div id="rangeBreakdownList" style="margin-top:10px;"></div>
-          </div>
-        </div>
-
-        <div class="card">
-          <h2>Grafik Ringkasan Bulan Ini</h2>
+          <h2 class="title-with-ico">
+            <svg class="ico" style="color:#38bdf8;" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+            Grafik Ringkasan Bulan Ini
+          </h2>
           <div id="overviewChart" class="chart-card"></div>
         </div>
 
+        <!-- GRAFIK PEMAKAIAN PER POS -->
         <div class="card">
           <div class="row-between">
-            <h2 style="margin-bottom:0;">Grafik Pemakaian per Pos</h2>
+            <h2 class="title-with-ico" style="margin-bottom:0;">
+              <svg class="ico" style="color:#f59e0b;" viewBox="0 0 24 24"><path d="M12 20V10"/><path d="M18 20V4"/><path d="M6 20v-6"/></svg>
+              Grafik Pemakaian per Pos
+            </h2>
             <span class="muted">Terpakai vs Batas Pos</span>
           </div>
           <div id="topBudgetChart" class="chart-card"></div>
@@ -673,7 +838,10 @@
       <!-- TAB 2: CATAT PENGELUARAN & RIWAYAT -->
       <div id="tabCatat" class="hidden">
         <div class="card">
-          <h2>Catat Pengeluaran</h2>
+          <h2 class="title-with-ico">
+            <svg class="ico" style="color:#22c55e;" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+            Catat Pengeluaran
+          </h2>
           <form id="txForm">
             <label for="txBudgetSelect">Pos Anggaran</label>
             <select id="txBudgetSelect" required></select>
@@ -697,7 +865,10 @@
         </div>
 
         <div class="card">
-          <h2>Riwayat Pengeluaran Bulan Ini</h2>
+          <h2 class="title-with-ico">
+            <svg class="ico" style="color:#67e8f9;" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 15"/></svg>
+            Riwayat Pengeluaran Bulan Ini
+          </h2>
           <div id="txList"><p class="muted">Belum ada transaksi.</p></div>
         </div>
       </div>
@@ -706,7 +877,10 @@
       <div id="tabRekap" class="hidden">
         <div class="card">
           <div class="row-between">
-            <h2 style="margin-bottom:0;">Rekap Anggaran (List Lama / Manual)</h2>
+            <h2 class="title-with-ico" style="margin-bottom:0;">
+              <svg class="ico" style="color:#67e8f9;" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.12 2.12 0 0 1 3 3L12 15l-4 1 1-4Z"/></svg>
+              Rekap Anggaran (List Lama / Manual)
+            </h2>
             <button type="button" id="cancelEditBudgetBtn" class="secondary small hidden">Batal Edit</button>
           </div>
           <form id="rekapForm">
@@ -746,15 +920,72 @@
         </div>
 
         <div class="card">
-          <h2>Daftar Pos Rekap Anggaran Bulan Ini</h2>
+          <h2 class="title-with-ico">
+            <svg class="ico" style="color:#38bdf8;" viewBox="0 0 24 24"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><circle cx="4" cy="6" r="1"/><circle cx="4" cy="12" r="1"/><circle cx="4" cy="18" r="1"/></svg>
+            Daftar Pos Rekap Anggaran Bulan Ini
+          </h2>
           <div id="rekapList"><p class="muted">Belum ada pos anggaran pada bulan ini.</p></div>
         </div>
       </div>
 
-      <!-- TAB 4: RINCIAN ITEM DALAM POS ANGGARAN -->
-      <div id="tabRincian" class="hidden">
+      <!-- TAB 4: Filter (FILTER BEBERAPA BULAN + RINCIAN ITEM) -->
+      <div id="tabFilter" class="hidden">
+        <!-- FILTER PENGELUARAN BEBERAPA BULAN -->
         <div class="card">
-          <h2>Tambah List Detail Item dalam Pos</h2>
+          <div class="row-between">
+            <h2 class="title-with-ico" style="margin-bottom:0;">
+              <svg class="ico" style="color:#22d3ee;" viewBox="0 0 24 24"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
+              Filter Pengeluaran Beberapa Bulan
+            </h2>
+            <span id="rangeCountBadge" class="badge badge-ok">0 Bulan</span>
+          </div>
+          <p class="muted" style="margin-top:4px;">Pilih rentang bulan untuk mengetahui total keuangan yang sudah dikeluarkan.</p>
+
+          <div class="month-range-box">
+            <div class="grid-2" style="margin-top:0;">
+              <div>
+                <label for="rangeStartMonth" style="margin-top:0;">Dari Bulan</label>
+                <input type="month" id="rangeStartMonth" />
+              </div>
+              <div>
+                <label for="rangeEndMonth" style="margin-top:0;">Sampai Bulan</label>
+                <input type="month" id="rangeEndMonth" />
+              </div>
+            </div>
+
+            <div class="quick-months">
+              <button type="button" id="last3MonthsBtn" class="secondary">3 Bulan Terakhir</button>
+              <button type="button" id="last6MonthsBtn" class="secondary">6 Bulan Terakhir</button>
+              <button type="button" id="syncActiveMonthBtn" class="secondary">Bulan Aktif Saja</button>
+            </div>
+
+            <div class="grid-2" style="margin-top:10px;">
+              <div class="stat-box">
+                <div class="stat-label">
+                  <svg class="ico" style="color:#ef4444;" viewBox="0 0 24 24"><polyline points="23 18 13.5 8.5 8.5 13.5 1 6"/><polyline points="17 18 23 18 23 12"/></svg>
+                  Total Pengeluaran Rentang
+                </div>
+                <div id="rangeTotalSpentDisplay" class="stat-val danger">Rp0</div>
+              </div>
+              <div class="stat-box">
+                <div class="stat-label">
+                  <svg class="ico" style="color:#67e8f9;" viewBox="0 0 24 24"><line x1="12" y1="20" x2="12" y2="10"/><line x1="18" y1="20" x2="18" y2="4"/><line x1="6" y1="20" x2="6" y2="16"/></svg>
+                  Rata-Rata per Bulan
+                </div>
+                <div id="rangeAvgSpentDisplay" class="stat-val" style="color:#67e8f9;">Rp0</div>
+              </div>
+            </div>
+
+            <div id="rangeBreakdownList" style="margin-top:10px;"></div>
+          </div>
+        </div>
+
+        <!-- RINCIAN ITEM DALAM POS ANGGARAN -->
+        <div class="card">
+          <h2 class="title-with-ico">
+            <svg class="ico" style="color:#22c55e;" viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
+            Tambah List Detail Item dalam Pos
+          </h2>
           <p class="muted">Contoh: pilih pos <strong style="color:#67e8f9;">Belanja Bulanan</strong>, lalu tambahkan rincian seperti <em>Beras</em>, <em>Minyak goreng</em>, dan <em>Telur</em>.</p>
           <form id="subItemForm">
             <label for="subTargetBudget">Pilih Pos Anggaran Induk</label>
@@ -771,7 +1002,10 @@
         </div>
 
         <div class="card">
-          <h2>Rekap Pos & Detail Item Terpakai</h2>
+          <h2 class="title-with-ico">
+            <svg class="ico" style="color:#38bdf8;" viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+            Rekap Pos & Detail Item Terpakai
+          </h2>
           <div id="detailBreakdownList"><p class="muted">Belum ada data pos atau item.</p></div>
         </div>
       </div>
@@ -842,13 +1076,39 @@
       "12": "Desember"
     };
 
+    const MONTH_SHORT_ID = {
+      "01": "Jan",
+      "02": "Feb",
+      "03": "Mar",
+      "04": "Apr",
+      "05": "Mei",
+      "06": "Jun",
+      "07": "Jul",
+      "08": "Agu",
+      "09": "Sep",
+      "10": "Okt",
+      "11": "Nov",
+      "12": "Des"
+    };
+
     const DONUT_COLORS = ["#22c55e", "#06b6d4", "#f59e0b", "#a855f7", "#ef4444", "#38bdf8", "#14b8a6", "#f43f5e"];
 
     const rupiah = (n) => "Rp" + Number(n || 0).toLocaleString("id-ID");
+    const compactRupiah = (n) => {
+      const val = Number(n || 0);
+      if (val >= 1000000) return "Rp" + (val / 1000000).toFixed(1).replace(/\.0$/, "") + "jt";
+      if (val >= 1000) return "Rp" + Math.round(val / 1000) + "rb";
+      return "Rp" + val;
+    };
     const formatMonthLabel = (ym) => {
       if (!ym || !ym.includes("-")) return ym || "";
       const [y, m] = ym.split("-");
       return `${MONTH_NAMES_ID[m] || m} ${y}`;
+    };
+    const formatShortMonth = (ym) => {
+      if (!ym || !ym.includes("-")) return ym || "";
+      const [y, m] = ym.split("-");
+      return `${MONTH_SHORT_ID[m] || m} ${y.slice(-2)}`;
     };
     const slugify = (str) =>
       String(str || "")
@@ -1040,7 +1300,7 @@
         document.querySelectorAll(".tab-btn").forEach((b) => b.classList.remove("active"));
         btn.classList.add("active");
         const target = btn.getAttribute("data-tab");
-        ["tabDashboard", "tabCatat", "tabRekap", "tabRincian"].forEach((id) => {
+        ["tabDashboard", "tabCatat", "tabRekap", "tabFilter"].forEach((id) => {
           document.getElementById(id).classList.toggle("hidden", id !== target);
         });
       });
@@ -1357,6 +1617,37 @@
       }
     });
 
+    function renderMonthlyColumnChart(monthsList, perMonthTotals) {
+      const chartEl = document.getElementById("monthlyColumnChart");
+      const labelEl = document.getElementById("monthlyBarRangeLabel");
+
+      if (!monthsList.length) {
+        labelEl.textContent = "0 Bulan";
+        chartEl.innerHTML = `<p class="muted">Pilih rentang bulan pada tab Filter.</p>`;
+        return;
+      }
+
+      labelEl.textContent = monthsList.length === 1
+        ? formatShortMonth(monthsList[0])
+        : `${formatShortMonth(monthsList[0])} – ${formatShortMonth(monthsList[monthsList.length - 1])}`;
+
+      const maxVal = Math.max(...monthsList.map((m) => perMonthTotals[m] || 0), 1);
+
+      chartEl.innerHTML = monthsList.map((m) => {
+        const val = perMonthTotals[m] || 0;
+        const heightPct = val > 0 ? Math.max(8, Math.round((val / maxVal) * 100)) : 0;
+        return `
+          <div class="monthly-col-item" title="${formatMonthLabel(m)}: ${rupiah(val)}">
+            <div class="monthly-col-val">${val > 0 ? compactRupiah(val) : "Rp0"}</div>
+            <div class="monthly-col-track">
+              <div class="monthly-col-fill" style="height:${heightPct}%;"></div>
+            </div>
+            <div class="monthly-col-label">${formatShortMonth(m)}</div>
+          </div>
+        `;
+      }).join("");
+    }
+
     function renderRangeSummary() {
       const startYm = rangeStartMonthInput.value;
       const endYm = rangeEndMonthInput.value;
@@ -1368,6 +1659,7 @@
         document.getElementById("rangeTotalSpentDisplay").textContent = rupiah(0);
         document.getElementById("rangeAvgSpentDisplay").textContent = rupiah(0);
         document.getElementById("rangeBreakdownList").innerHTML = `<p class="muted">Pilih bulan awal dan akhir terlebih dahulu.</p>`;
+        renderMonthlyColumnChart([], {});
         return;
       }
 
@@ -1403,6 +1695,8 @@
           <strong style="color:#f87171;">${rupiah(perMonthTotals[m] || 0)}</strong>
         </div>
       `).join("");
+
+      renderMonthlyColumnChart(monthsList, perMonthTotals);
     }
 
     function renderCategoryDonut(spentByCategory, totalSpent) {
@@ -1420,8 +1714,7 @@
 
       entries.forEach(([catName, amount], idx) => {
         const color = DONUT_COLORS[idx % DONUT_COLORS.length];
-        const pctExact = (amount / totalSpent) * 100;
-        const pctRound = Math.round(pctExact);
+        const pctRound = Math.round((amount / totalSpent) * 100);
         const deg = (amount / totalSpent) * 360;
         gradientStops.push(`${color} ${currentDeg.toFixed(1)}deg ${(currentDeg + deg).toFixed(1)}deg`);
         currentDeg += deg;
@@ -1675,12 +1968,17 @@
       } else {
         txListEl.innerHTML = txData.map((tx) => `
           <div class="tx-item">
-            <div>
-              <div>
-                <strong>${tx.budgetName || tx.budgetId}</strong>
-                ${tx.subItemName ? `• <span style="color:#67e8f9; font-weight:600;">${tx.subItemName}</span>` : ""}
+            <div style="display:flex; align-items:center; gap:9px;">
+              <div class="tx-icon-box">
+                <svg class="ico" viewBox="0 0 24 24"><path d="M4 2h16v20l-2-1.5-2 1.5-2-1.5-2 1.5-2-1.5-2 1.5-2-1.5L4 22V2z"/><line x1="8" y1="8" x2="16" y2="8"/><line x1="8" y1="12" x2="13" y2="12"/></svg>
               </div>
-              <div class="muted">${tx.date || ""} ${tx.note ? `• ${tx.note}` : ""}</div>
+              <div>
+                <div>
+                  <strong>${tx.budgetName || tx.budgetId}</strong>
+                  ${tx.subItemName ? `• <span style="color:#67e8f9; font-weight:600;">${tx.subItemName}</span>` : ""}
+                </div>
+                <div class="muted">${tx.date || ""} ${tx.note ? `• ${tx.note}` : ""}</div>
+              </div>
             </div>
             <div style="display:flex; align-items:center; gap:8px;">
               <strong style="color:#f87171;">-${rupiah(tx.amount)}</strong>
