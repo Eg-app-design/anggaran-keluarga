@@ -160,14 +160,14 @@
       letter-spacing: 0.6px;
     }
 
-    /* Bar Toggle Collapse seperti referensi */
+    /* Bar Toggle Collapse */
     .collapse-bar {
       width: 100%;
       margin-top: 0;
       padding: 10px 12px;
       border-radius: 12px;
       background: rgba(15, 23, 42, 0.92);
-      border: 1px solid rgba(56, 189, 248, 0.3);
+      border: 1px solid rgba(56, 189, 248, 0.35);
       color: var(--text);
       display: flex;
       align-items: center;
@@ -180,7 +180,7 @@
 
     .collapse-bar:hover {
       background: rgba(30, 41, 59, 0.95);
-      border-color: rgba(103, 232, 249, 0.55);
+      border-color: rgba(103, 232, 249, 0.6);
       box-shadow: 0 0 12px rgba(6, 182, 212, 0.15);
     }
 
@@ -202,30 +202,20 @@
       flex-shrink: 0;
     }
 
-    .collapse-bar {
-      width: 100%;
-      margin-top: 0;
-      padding: 10px 12px;
-      border-radius: 12px;
-      background: rgba(15, 23, 42, 0.92);
-      border: 1px solid rgba(250, 204, 21, 0.35);
-      color: var(--text);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 8px;
-      text-transform: none;
-      letter-spacing: 0.2px;
-      box-shadow: none;
+    /* Tanda panah kanan berwarna terang kontras */
+    .arrow-toggle-ico {
+      width: 16px;
+      height: 16px;
+      color: #67e8f9;
+      fill: currentColor;
+      stroke: none;
+      transition: transform 0.25s ease, color 0.2s ease;
+      flex-shrink: 0;
+      filter: drop-shadow(0 0 4px rgba(103, 232, 249, 0.45));
     }
 
-    .collapse-bar:hover {
-      background: rgba(30, 41, 59, 0.95);
-      border-color: rgba(250, 204, 21, 0.7);
-      box-shadow: 0 0 12px rgba(250, 204, 21, 0.18);
-    }
-
-    .chevron-ico.collapsed {
+    .arrow-toggle-ico.collapsed {
+      color: #f8fafc;
       transform: rotate(-90deg);
     }
 
@@ -792,9 +782,9 @@
           <svg class="ico" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="13" y2="17"/></svg>
           Rekap
         </button>
-        <button type="button" class="tab-btn" data-tab="tabFilter">
+        <button type="button" class="tab-btn" data-tab="tabItemFilter">
           <svg class="ico" viewBox="0 0 24 24"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
-          Filter
+          Item Filter
         </button>
       </div>
 
@@ -865,7 +855,7 @@
             </h2>
             <span id="monthlyBarRangeLabel" class="muted">Rentang Filter</span>
           </div>
-          <p class="muted" style="margin-top:4px;">Perbandingan total pengeluaran antarbulan (sinkron dengan rentang di tab <strong>Filter</strong>).</p>
+          <p class="muted" style="margin-top:4px;">Perbandingan total pengeluaran antarbulan (sinkron dengan rentang di tab <strong>Item Filter</strong>).</p>
           <div id="monthlyColumnChart" class="monthly-col-chart">
             <p class="muted">Belum ada data bulan untuk digrafikkan.</p>
           </div>
@@ -999,15 +989,15 @@
             </span>
             <span class="collapse-bar-right">
               <span id="rekapListCountBadge" class="badge badge-ok">0 Pos</span>
-              <svg id="rekapListChevron" class="chevron-ico" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+              <svg id="rekapListArrow" class="arrow-toggle-ico" viewBox="0 0 24 24"><path d="M7 10l5 5 5-5H7z"/></svg>
             </span>
           </button>
           <div id="rekapList" class="collapsible-body"><p class="muted">Belum ada pos anggaran pada bulan ini.</p></div>
         </div>
       </div>
 
-      <!-- TAB 4: Filter (FILTER BEBERAPA BULAN + RINCIAN ITEM) -->
-      <div id="tabFilter" class="hidden">
+      <!-- TAB 4: ITEM FILTER (FILTER BEBERAPA BULAN + RINCIAN ITEM) -->
+      <div id="tabItemFilter" class="hidden">
         <!-- FILTER PENGELUARAN BEBERAPA BULAN -->
         <div class="card">
           <div class="row-between">
@@ -1087,7 +1077,7 @@
             </span>
             <span class="collapse-bar-right">
               <span id="detailItemCountBadge" class="badge badge-ok">0 Item</span>
-              <svg id="detailBreakdownChevron" class="chevron-ico" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+              <svg id="detailBreakdownArrow" class="arrow-toggle-ico" viewBox="0 0 24 24"><path d="M7 10l5 5 5-5H7z"/></svg>
             </span>
           </button>
           <div id="detailBreakdownList" class="collapsible-body"><p class="muted">Belum ada data pos atau item.</p></div>
@@ -1258,11 +1248,11 @@
 
     const toggleRekapListBtn = document.getElementById("toggleRekapListBtn");
     const rekapListEl = document.getElementById("rekapList");
-    const rekapListChevron = document.getElementById("rekapListChevron");
+    const rekapListArrow = document.getElementById("rekapListArrow");
 
     const toggleDetailBreakdownBtn = document.getElementById("toggleDetailBreakdownBtn");
     const detailEl = document.getElementById("detailBreakdownList");
-    const detailBreakdownChevron = document.getElementById("detailBreakdownChevron");
+    const detailBreakdownArrow = document.getElementById("detailBreakdownArrow");
 
     let editingBudgetDocId = null;
     let isRekapListExpanded = true;
@@ -1271,11 +1261,11 @@
     function syncCollapseUI() {
       rekapListEl.classList.toggle("hidden", !isRekapListExpanded);
       toggleRekapListBtn.setAttribute("aria-expanded", String(isRekapListExpanded));
-      rekapListChevron.classList.toggle("collapsed", !isRekapListExpanded);
+      rekapListArrow.classList.toggle("collapsed", !isRekapListExpanded);
 
       detailEl.classList.toggle("hidden", !isDetailBreakdownExpanded);
       toggleDetailBreakdownBtn.setAttribute("aria-expanded", String(isDetailBreakdownExpanded));
-      detailBreakdownChevron.classList.toggle("collapsed", !isDetailBreakdownExpanded);
+      detailBreakdownArrow.classList.toggle("collapsed", !isDetailBreakdownExpanded);
     }
 
     toggleRekapListBtn.addEventListener("click", () => {
@@ -1414,7 +1404,7 @@
         document.querySelectorAll(".tab-btn").forEach((b) => b.classList.remove("active"));
         btn.classList.add("active");
         const target = btn.getAttribute("data-tab");
-        ["tabDashboard", "tabCatat", "tabRekap", "tabFilter"].forEach((id) => {
+        ["tabDashboard", "tabCatat", "tabRekap", "tabItemFilter"].forEach((id) => {
           document.getElementById(id).classList.toggle("hidden", id !== target);
         });
       });
@@ -1737,7 +1727,7 @@
 
       if (!monthsList.length) {
         labelEl.textContent = "0 Bulan";
-        chartEl.innerHTML = `<p class="muted">Pilih rentang bulan pada tab Filter.</p>`;
+        chartEl.innerHTML = `<p class="muted">Pilih rentang bulan pada tab Item Filter.</p>`;
         return;
       }
 
