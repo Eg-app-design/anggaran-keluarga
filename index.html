@@ -676,6 +676,40 @@
       gap: 4px;
     }
 
+    .extra-income-btn {
+      background: rgba(34, 197, 94, 0.14);
+      color: #4ade80;
+      border: 1px solid rgba(34, 197, 94, 0.45);
+    }
+
+    .extra-income-btn:hover {
+      background: rgba(34, 197, 94, 0.24);
+      box-shadow: 0 0 10px rgba(34, 197, 94, 0.2);
+    }
+
+    .extra-income-panel {
+      margin-top: 8px;
+      padding: 10px;
+      background: rgba(2, 6, 23, 0.72);
+      border: 1px solid rgba(34, 197, 94, 0.3);
+      border-radius: 10px;
+    }
+
+    .extra-income-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 0;
+      border-top: 1px solid #1e293b;
+      font-size: 0.78rem;
+    }
+
+    .extra-income-row:first-child {
+      border-top: none;
+      padding-top: 0;
+    }
+
     .quick-months {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
@@ -1094,14 +1128,18 @@
           <button type="button" id="nextMonthBtn" class="secondary">Bulan Depan</button>
         </div>
 
-        <!-- GAJI / PEMASUKAN BISA DIEDIT & DI-CLEAR -->
+        <!-- GAJI / PEMASUKAN BISA DIEDIT, TAMBAH PEMASUKAN LAIN & DI-CLEAR -->
         <div class="sub-box">
           <div class="row-between">
             <span class="title-with-ico" style="font-size:0.8rem; font-weight:700; color:#cbd5e1;">
               <svg class="ico" style="color:#22c55e;" viewBox="0 0 24 24"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2.5"/><path d="M6 12h.01M18 12h.01"/></svg>
               Gaji / Pemasukan Bulan Ini
             </span>
-            <div style="display:flex; gap:6px;">
+            <div style="display:flex; gap:6px; flex-wrap:wrap;">
+              <button type="button" id="toggleExtraIncomeBtn" class="extra-income-btn small">
+                <svg class="ico" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                Pemasukan Lain
+              </button>
               <button type="button" id="toggleIncomeEditBtn" class="secondary small">
                 <svg class="ico" viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
                 Edit Gaji
@@ -1112,16 +1150,34 @@
               </button>
             </div>
           </div>
+
           <div id="incomeValueText" style="font-size:1.25rem; font-weight:800; margin-top:4px; color:#22c55e;">
             Rp0
           </div>
+          <div id="incomeBreakdownNote" class="muted" style="font-size:0.73rem; margin-top:2px;"></div>
+
+          <!-- FORM TAMBAH PEMASUKAN SELAIN GAJI -->
+          <div id="extraIncomeFormBox" class="extra-income-panel hidden">
+            <div style="font-size:0.76rem; font-weight:700; color:#4ade80; margin-bottom:6px;">
+              Tambah Pemasukan Lain (Tergabung ke Total Gaji/Pemasukan)
+            </div>
+            <div class="inline-edit" style="margin-top:0;">
+              <input type="text" id="extraIncomeLabelInput" placeholder="Keterangan (misal: Bonus / Freelance)" />
+              <input type="number" id="extraIncomeAmountInput" min="1" step="1000" placeholder="Nominal (Rp)" style="max-width:140px;" />
+              <button type="button" id="saveExtraIncomeBtn" class="small">Tambah</button>
+            </div>
+          </div>
+
+          <!-- DAFTAR PEMASUKAN LAIN BULAN INI -->
+          <div id="extraIncomeListBox" class="extra-income-panel hidden"></div>
+
           <div id="incomeEditRow" class="inline-edit hidden">
             <input type="number" id="incomeInput" min="0" step="1000" placeholder="Contoh: 7000000" />
             <button type="button" id="saveIncomeBtn" class="small">Simpan</button>
           </div>
           <div id="clearIncomeConfirmBox" class="confirm-box hidden">
             <div style="font-size:0.84rem; font-weight:700; color:#fca5a5;">
-              apakah anda ingin menghapus Data Gaji ?
+              apakah anda ingin menghapus Data Gaji & Pemasukan Lain ?
             </div>
             <div style="display:flex; gap:8px; margin-top:8px;">
               <button type="button" id="confirmClearIncomeYesBtn" class="danger-btn small">Ya</button>
@@ -1786,6 +1842,14 @@
     const txSubItemSelect = document.getElementById("txSubItemSelect");
     const txAmountInput = document.getElementById("txAmount");
 
+    const toggleExtraIncomeBtn = document.getElementById("toggleExtraIncomeBtn");
+    const extraIncomeFormBox = document.getElementById("extraIncomeFormBox");
+    const extraIncomeLabelInput = document.getElementById("extraIncomeLabelInput");
+    const extraIncomeAmountInput = document.getElementById("extraIncomeAmountInput");
+    const saveExtraIncomeBtn = document.getElementById("saveExtraIncomeBtn");
+    const extraIncomeListBox = document.getElementById("extraIncomeListBox");
+    const incomeBreakdownNote = document.getElementById("incomeBreakdownNote");
+
     const openCameraBtn = document.getElementById("openCameraBtn");
     const openAttachmentBtn = document.getElementById("openAttachmentBtn");
     const cameraReceiptInput = document.getElementById("cameraReceiptInput");
@@ -2149,6 +2213,7 @@
       editingBudgetDocId = null;
       cancelEditBudgetBtn.classList.add("hidden");
       document.getElementById("clearIncomeConfirmBox").classList.add("hidden");
+      extraIncomeFormBox.classList.add("hidden");
       syncDayDropdownsForMonth(true);
       renderYearlyChart();
       renderDailyFilterSummary();
@@ -2260,12 +2325,21 @@
     let unsubAllTx = null;
 
     let monthlyIncome = 0;
+    let extraIncomes = [];
     let manualTotalBudget = 0;
     let budgetsData = [];
     let subItemsData = [];
     let txData = [];
     let allTxData = [];
     let lastAutoFilledBudgetId = "";
+
+    function getExtraIncomeTotal() {
+      return extraIncomes.reduce((acc, item) => acc + Number(item.amount || 0), 0);
+    }
+
+    function getCombinedIncomeTotal() {
+      return Number(monthlyIncome || 0) + getExtraIncomeTotal();
+    }
 
     onAuthStateChanged(auth, (user) => {
       if (user) {
@@ -2295,6 +2369,7 @@
       [unsubSettings, unsubBudgets, unsubSubItems, unsubTx].forEach((fn) => fn && fn());
       lastAutoFilledBudgetId = "";
       monthlyIncome = 0;
+      extraIncomes = [];
       manualTotalBudget = 0;
       budgetsData = [];
       subItemsData = [];
@@ -2305,11 +2380,13 @@
         if (snap.exists()) {
           const data = snap.data();
           monthlyIncome = data.income !== undefined ? Number(data.income) : 0;
+          extraIncomes = Array.isArray(data.extraIncomes) ? data.extraIncomes : [];
           manualTotalBudget = data.manualTotalBudget !== undefined
             ? Number(data.manualTotalBudget)
             : (data.customTotalBudget !== undefined && data.customTotalBudget !== null ? Number(data.customTotalBudget) : 0);
         } else {
           monthlyIncome = 0;
+          extraIncomes = [];
           manualTotalBudget = 0;
         }
         renderAll();
@@ -2333,8 +2410,72 @@
       });
     }
 
+    toggleExtraIncomeBtn.addEventListener("click", () => {
+      document.getElementById("incomeEditRow").classList.add("hidden");
+      document.getElementById("clearIncomeConfirmBox").classList.add("hidden");
+      extraIncomeFormBox.classList.toggle("hidden");
+      if (!extraIncomeFormBox.classList.contains("hidden")) {
+        extraIncomeLabelInput.focus();
+      }
+    });
+
+    saveExtraIncomeBtn.addEventListener("click", async () => {
+      const month = getSelectedMonth();
+      const label = (extraIncomeLabelInput.value || "").trim() || "Pemasukan Lain";
+      const amt = Number(extraIncomeAmountInput.value || 0);
+      if (amt <= 0) {
+        statusMsg.textContent = "Masukkan nominal pemasukan lain lebih dari Rp0.";
+        return;
+      }
+
+      const nextList = [
+        ...extraIncomes,
+        {
+          id: `${Date.now()}_${Math.random().toString(36).slice(2, 7)}`,
+          label,
+          amount: amt
+        }
+      ];
+
+      try {
+        await setDoc(doc(db, "monthly_settings", month), {
+          month,
+          income: monthlyIncome,
+          extraIncomes: nextList,
+          manualTotalBudget,
+          updatedBy: auth.currentUser?.email || "",
+          updatedAt: new Date().toISOString()
+        }, { merge: true });
+        extraIncomeLabelInput.value = "";
+        extraIncomeAmountInput.value = "";
+        extraIncomeFormBox.classList.add("hidden");
+        statusMsg.textContent = `Pemasukan lain "${label}" (${rupiah(amt)}) ditambahkan dan digabung ke total gaji.`;
+      } catch (err) {
+        statusMsg.textContent = "Gagal menambah pemasukan lain: " + err.message;
+      }
+    });
+
+    async function removeExtraIncomeItem(itemId) {
+      const month = getSelectedMonth();
+      const nextList = extraIncomes.filter((it) => it.id !== itemId);
+      try {
+        await setDoc(doc(db, "monthly_settings", month), {
+          month,
+          income: monthlyIncome,
+          extraIncomes: nextList,
+          manualTotalBudget,
+          updatedBy: auth.currentUser?.email || "",
+          updatedAt: new Date().toISOString()
+        }, { merge: true });
+        statusMsg.textContent = "Item pemasukan lain dihapus.";
+      } catch (err) {
+        statusMsg.textContent = "Gagal menghapus pemasukan lain: " + err.message;
+      }
+    }
+
     document.getElementById("toggleIncomeEditBtn").addEventListener("click", () => {
       document.getElementById("clearIncomeConfirmBox").classList.add("hidden");
+      extraIncomeFormBox.classList.add("hidden");
       const row = document.getElementById("incomeEditRow");
       row.classList.toggle("hidden");
       document.getElementById("incomeInput").value = monthlyIncome;
@@ -2347,12 +2488,13 @@
         await setDoc(doc(db, "monthly_settings", month), {
           month,
           income: val,
+          extraIncomes,
           manualTotalBudget,
           updatedBy: auth.currentUser?.email || "",
           updatedAt: new Date().toISOString()
         }, { merge: true });
         document.getElementById("incomeEditRow").classList.add("hidden");
-        statusMsg.textContent = `Gaji/Pemasukan bulan ${month} disimpan (${rupiah(val)}).`;
+        statusMsg.textContent = `Gaji pokok bulan ${month} disimpan (${rupiah(val)}).`;
       } catch (err) {
         statusMsg.textContent = "Gagal simpan gaji: " + err.message;
       }
@@ -2360,6 +2502,7 @@
 
     document.getElementById("clearIncomeBtn").addEventListener("click", () => {
       document.getElementById("incomeEditRow").classList.add("hidden");
+      extraIncomeFormBox.classList.add("hidden");
       document.getElementById("clearIncomeConfirmBox").classList.toggle("hidden");
     });
 
@@ -2373,6 +2516,7 @@
         await setDoc(doc(db, "monthly_settings", month), {
           month,
           income: 0,
+          extraIncomes: [],
           manualTotalBudget,
           updatedBy: auth.currentUser?.email || "",
           updatedAt: new Date().toISOString()
@@ -2380,7 +2524,7 @@
         document.getElementById("incomeInput").value = "";
         document.getElementById("incomeEditRow").classList.add("hidden");
         document.getElementById("clearIncomeConfirmBox").classList.add("hidden");
-        statusMsg.textContent = `Data Gaji bulan ${month} berhasil dihapus (Rp0).`;
+        statusMsg.textContent = `Data Gaji & Pemasukan Lain bulan ${month} berhasil dihapus (Rp0).`;
       } catch (err) {
         statusMsg.textContent = "Gagal menghapus Data Gaji: " + err.message;
       }
@@ -2399,6 +2543,7 @@
         await setDoc(doc(db, "monthly_settings", month), {
           month,
           income: monthlyIncome,
+          extraIncomes,
           manualTotalBudget: val,
           updatedBy: auth.currentUser?.email || "",
           updatedAt: new Date().toISOString()
@@ -2937,7 +3082,32 @@
     }
 
     function renderAll() {
-      document.getElementById("incomeValueText").textContent = rupiah(monthlyIncome);
+      const extraTotal = getExtraIncomeTotal();
+      const combinedIncome = getCombinedIncomeTotal();
+
+      document.getElementById("incomeValueText").textContent = rupiah(combinedIncome);
+      if (extraIncomes.length > 0) {
+        incomeBreakdownNote.textContent = `Gaji: ${rupiah(monthlyIncome)} + Pemasukan Lain: ${rupiah(extraTotal)} (${extraIncomes.length} item)`;
+        extraIncomeListBox.classList.remove("hidden");
+        extraIncomeListBox.innerHTML = extraIncomes.map((item) => `
+          <div class="extra-income-row">
+            <div>
+              <strong style="color:#e2e8f0;">${item.label || "Pemasukan Lain"}</strong>
+              <span style="color:#4ade80; font-weight:700; margin-left:6px;">+${rupiah(item.amount)}</span>
+            </div>
+            <button type="button" class="danger-btn small" style="padding:3px 8px; font-size:0.66rem;" data-del-extra="${item.id}">Hapus</button>
+          </div>
+        `).join("");
+
+        extraIncomeListBox.querySelectorAll("[data-del-extra]").forEach((btn) => {
+          btn.addEventListener("click", () => removeExtraIncomeItem(btn.getAttribute("data-del-extra")));
+        });
+      } else {
+        incomeBreakdownNote.textContent = "";
+        extraIncomeListBox.classList.add("hidden");
+        extraIncomeListBox.innerHTML = "";
+      }
+
       document.getElementById("rekapListCountBadge").textContent = `${budgetsData.length} Pos`;
       document.getElementById("detailItemCountBadge").textContent = `${subItemsData.length} Item`;
 
@@ -2991,8 +3161,8 @@
       renderCategoryDonut(spentByCategory, monthlySpent);
 
       const effectiveTotalBudget = Number(manualTotalBudget || 0);
-      const diffVsIncome = monthlyIncome - effectiveTotalBudget;
-      const remainIncome = monthlyIncome - monthlySpent;
+      const diffVsIncome = combinedIncome - effectiveTotalBudget;
+      const remainIncome = combinedIncome - monthlySpent;
 
       document.getElementById("posCountDisplay").textContent = `${budgetsData.length} Pos`;
       document.getElementById("totalBudgetDisplay").textContent = rupiah(effectiveTotalBudget);
@@ -3009,16 +3179,16 @@
       remEl.textContent = (remainIncome >= 0 ? "" : "-") + rupiah(Math.abs(remainIncome));
       remEl.className = remainIncome >= 0 ? "ok" : "danger";
 
-      const maxScale = Math.max(monthlyIncome, effectiveTotalBudget, monthlySpent, 1);
+      const maxScale = Math.max(combinedIncome, effectiveTotalBudget, monthlySpent, 1);
       const pctBudgetVsMax = Math.min(100, Math.round((effectiveTotalBudget / maxScale) * 100));
       const pctSpentVsMax = Math.min(100, Math.round((monthlySpent / maxScale) * 100));
-      const pctSpentVsIncome = monthlyIncome > 0 ? Math.round((monthlySpent / monthlyIncome) * 100) : 0;
+      const pctSpentVsIncome = combinedIncome > 0 ? Math.round((monthlySpent / combinedIncome) * 100) : 0;
 
       document.getElementById("overviewChart").innerHTML = `
         <div class="chart-row">
           <div class="row-between" style="font-size:0.82rem;">
             <span><strong>Gaji / Pemasukan</strong></span>
-            <strong style="color:#5eead4;">${rupiah(monthlyIncome)} (100%)</strong>
+            <strong style="color:#5eead4;">${rupiah(combinedIncome)} (100%)</strong>
           </div>
           <div class="bar-bg"><div class="bar-fill teal" style="width:100%"></div></div>
         </div>
@@ -3032,7 +3202,7 @@
         <div class="chart-row">
           <div class="row-between" style="font-size:0.82rem;">
             <span><strong>Terpakai Bulan Ini</strong></span>
-            <strong>${rupiah(monthlySpent)} (${pctSpentVsIncome}% gaji)</strong>
+            <strong>${rupiah(monthlySpent)} (${pctSpentVsIncome}% pemasukan)</strong>
           </div>
           <div class="bar-bg"><div class="bar-fill ${pctSpentVsIncome > 100 ? "danger" : pctSpentVsIncome >= 80 ? "warn" : ""}" style="width:${pctSpentVsMax}%"></div></div>
         </div>
