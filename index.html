@@ -41,6 +41,53 @@
       min-height: 100vh;
     }
 
+    #appSplash {
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      background: radial-gradient(circle at top right, #082f49 0%, #020617 50%, #020617 100%);
+      color: var(--text);
+      transition: opacity 0.35s ease, visibility 0.35s ease;
+    }
+
+    #appSplash.splash-hide {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    .splash-logo-box {
+      width: 76px;
+      height: 76px;
+      border-radius: 22px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, rgba(13, 148, 136, 0.3), rgba(6, 182, 212, 0.2));
+      border: 1px solid rgba(103, 232, 249, 0.45);
+      color: #67e8f9;
+      box-shadow: 0 0 28px rgba(6, 182, 212, 0.22);
+    }
+
+    .splash-title {
+      font-size: 1.15rem;
+      font-weight: 800;
+      letter-spacing: 0.2px;
+      background: linear-gradient(90deg, #ffffff, #67e8f9);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .splash-sub {
+      font-size: 0.76rem;
+      color: var(--muted);
+    }
+
     .container {
       max-width: 580px;
       margin: 0 auto;
@@ -465,6 +512,89 @@
       color: #cbd5e1;
     }
 
+    .field-label-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 10px;
+      margin-bottom: 4px;
+    }
+
+    .field-label-row label {
+      margin-top: 0;
+      margin-bottom: 0;
+    }
+
+    .media-action-group {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .media-action-btn {
+      width: auto;
+      margin-top: 0;
+      padding: 4px 9px;
+      font-size: 0.7rem;
+      border-radius: 8px;
+      background: rgba(6, 182, 212, 0.14);
+      color: #67e8f9;
+      border: 1px solid rgba(103, 232, 249, 0.45);
+      font-weight: 700;
+      text-transform: none;
+      letter-spacing: 0.2px;
+      box-shadow: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .media-action-btn:hover {
+      background: rgba(6, 182, 212, 0.26);
+      box-shadow: 0 0 10px rgba(6, 182, 212, 0.2);
+    }
+
+    .media-limit-note {
+      font-size: 0.68rem;
+      color: var(--muted);
+      text-align: right;
+      margin-top: 3px;
+    }
+
+    .receipt-preview-box {
+      margin-top: 8px;
+      padding: 8px 10px;
+      background: rgba(2, 6, 23, 0.72);
+      border: 1px solid rgba(56, 189, 248, 0.35);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .receipt-preview-thumb {
+      width: 52px;
+      height: 52px;
+      object-fit: cover;
+      border-radius: 8px;
+      border: 1px solid #334155;
+      flex-shrink: 0;
+      cursor: pointer;
+    }
+
+    .tx-receipt-thumb {
+      width: 40px;
+      height: 40px;
+      object-fit: cover;
+      border-radius: 8px;
+      border: 1px solid rgba(103, 232, 249, 0.4);
+      flex-shrink: 0;
+      cursor: pointer;
+    }
+
     input, select, button {
       width: 100%;
       padding: 10px 12px;
@@ -876,6 +1006,15 @@
   </style>
 </head>
 <body>
+  <!-- SPLASH SCREEN GELAP AWAL -->
+  <div id="appSplash" aria-hidden="true">
+    <div class="splash-logo-box">
+      <svg class="ico" style="width:36px;height:36px;" viewBox="0 0 24 24"><path d="M3 10.5L12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1v-9.5z"/></svg>
+    </div>
+    <div class="splash-title">Anggaran Keluarga</div>
+    <div class="splash-sub">Memuat data anggaran...</div>
+  </div>
+
   <div class="container">
     <!-- LOGIN -->
     <div id="authSection" class="card" style="margin-top:24px;">
@@ -1158,8 +1297,34 @@
             Catat Pengeluaran
           </h2>
           <form id="txForm">
-            <label for="txBudgetSelect">Pos Anggaran</label>
+            <div class="field-label-row">
+              <label for="txBudgetSelect">Pos Anggaran</label>
+              <div class="media-action-group">
+                <button type="button" id="openCameraBtn" class="media-action-btn" title="Foto struk belanja langsung dengan kamera HP">
+                  <svg class="ico" style="width:12px;height:12px;" viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+                  Kamera
+                </button>
+                <button type="button" id="openAttachmentBtn" class="media-action-btn" title="Pilih foto struk dari galeri HP">
+                  <svg class="ico" style="width:12px;height:12px;" viewBox="0 0 24 24"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
+                  Lampiran
+                </button>
+              </div>
+            </div>
+            <div class="media-limit-note">Foto Maksimal 1 MB</div>
+            <input type="file" id="cameraReceiptInput" accept="image/*" capture="environment" class="hidden" />
+            <input type="file" id="galleryReceiptInput" accept="image/*" class="hidden" />
             <select id="txBudgetSelect" required></select>
+
+            <div id="receiptPreviewBox" class="receipt-preview-box hidden">
+              <div style="display:flex; align-items:center; gap:10px; min-width:0;">
+                <img id="receiptPreviewImg" class="receipt-preview-thumb" alt="Pratinjau Struk" />
+                <div style="min-width:0;">
+                  <div id="receiptFileName" style="font-size:0.78rem; font-weight:700; color:#67e8f9; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">Struk terlampir</div>
+                  <div id="receiptFileMeta" class="muted" style="font-size:0.7rem;">Siap disimpan bersama transaksi</div>
+                </div>
+              </div>
+              <button type="button" id="removeReceiptBtn" class="danger-btn small">Hapus</button>
+            </div>
 
             <label for="txSubItemSelect">Rincian Item (Opsional)</label>
             <select id="txSubItemSelect">
@@ -1308,7 +1473,7 @@
           </div>
         </div>
 
-        <!-- MODE BULANAN (TIDAK ADA PERUBAHAN) -->
+        <!-- MODE BULANAN -->
         <div id="filterMonthlySection">
           <div class="card">
             <div class="row-between">
@@ -1467,6 +1632,20 @@
     const auth = getAuth(app);
     const db = getFirestore(app);
 
+    const appSplashEl = document.getElementById("appSplash");
+    let splashHidden = false;
+
+    function hideSplashScreen() {
+      if (splashHidden || !appSplashEl) return;
+      splashHidden = true;
+      appSplashEl.classList.add("splash-hide");
+      setTimeout(() => {
+        appSplashEl.remove();
+      }, 400);
+    }
+
+    setTimeout(hideSplashScreen, 2500);
+
     const PREVIOUS_LIST = [
       { name: "Angsuran BRI", category: "Cicilan & Utang", limit: 1981000 },
       { name: "Listrik", category: "Utilitas & Rumah", limit: 130000 },
@@ -1607,6 +1786,108 @@
     const txSubItemSelect = document.getElementById("txSubItemSelect");
     const txAmountInput = document.getElementById("txAmount");
 
+    const openCameraBtn = document.getElementById("openCameraBtn");
+    const openAttachmentBtn = document.getElementById("openAttachmentBtn");
+    const cameraReceiptInput = document.getElementById("cameraReceiptInput");
+    const galleryReceiptInput = document.getElementById("galleryReceiptInput");
+    const receiptPreviewBox = document.getElementById("receiptPreviewBox");
+    const receiptPreviewImg = document.getElementById("receiptPreviewImg");
+    const receiptFileName = document.getElementById("receiptFileName");
+    const receiptFileMeta = document.getElementById("receiptFileMeta");
+    const removeReceiptBtn = document.getElementById("removeReceiptBtn");
+
+    let attachedReceiptDataUrl = "";
+    let attachedReceiptName = "";
+
+    function resetReceiptAttachment() {
+      attachedReceiptDataUrl = "";
+      attachedReceiptName = "";
+      cameraReceiptInput.value = "";
+      galleryReceiptInput.value = "";
+      receiptPreviewImg.src = "";
+      receiptPreviewBox.classList.add("hidden");
+    }
+
+    function compressImageFileToDataUrl(file, maxWidth = 800, quality = 0.65) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onerror = () => reject(new Error("Gagal membaca file gambar."));
+        reader.onload = (ev) => {
+          const img = new Image();
+          img.onerror = () => reject(new Error("Format gambar tidak dapat diproses."));
+          img.onload = () => {
+            let w = img.width;
+            let h = img.height;
+            if (w > maxWidth) {
+              h = Math.round((h * maxWidth) / w);
+              w = maxWidth;
+            }
+            const canvas = document.createElement("canvas");
+            canvas.width = w;
+            canvas.height = h;
+            const ctx = canvas.getContext("2d");
+            ctx.drawImage(img, 0, 0, w, h);
+            resolve(canvas.toDataURL("image/jpeg", quality));
+          };
+          img.src = ev.target.result;
+        };
+        reader.readAsDataURL(file);
+      });
+    }
+
+    async function handleReceiptSelected(file, sourceLabel) {
+      if (!file) return;
+      if (file.size > 1024 * 1024) {
+        statusMsg.textContent = "Ukuran foto melebihi batas maksimal 1 MB. Pilih foto lain.";
+        resetReceiptAttachment();
+        return;
+      }
+      try {
+        statusMsg.textContent = `Memproses foto struk dari ${sourceLabel}...`;
+        const compressedUrl = await compressImageFileToDataUrl(file, 800, 0.65);
+        if (compressedUrl.length > 780000) {
+          statusMsg.textContent = "Ukuran foto terlalu besar setelah dikompres. Coba pilih foto lain.";
+          return;
+        }
+        attachedReceiptDataUrl = compressedUrl;
+        attachedReceiptName = file.name || `struk_${sourceLabel.toLowerCase()}.jpg`;
+        receiptPreviewImg.src = attachedReceiptDataUrl;
+        receiptFileName.textContent = attachedReceiptName;
+        const approxKb = Math.round((attachedReceiptDataUrl.length * 3) / 4 / 1024);
+        receiptFileMeta.textContent = `${sourceLabel} • ~${approxKb} KB (Maks 1 MB)`;
+        receiptPreviewBox.classList.remove("hidden");
+        statusMsg.textContent = `Foto struk (${sourceLabel}) siap disimpan.`;
+      } catch (err) {
+        statusMsg.textContent = "Gagal memuat foto: " + err.message;
+      }
+    }
+
+    openCameraBtn.addEventListener("click", () => cameraReceiptInput.click());
+    openAttachmentBtn.addEventListener("click", () => galleryReceiptInput.click());
+
+    cameraReceiptInput.addEventListener("change", (e) => {
+      const f = e.target.files && e.target.files[0];
+      if (f) handleReceiptSelected(f, "Kamera");
+    });
+
+    galleryReceiptInput.addEventListener("change", (e) => {
+      const f = e.target.files && e.target.files[0];
+      if (f) handleReceiptSelected(f, "Lampiran");
+    });
+
+    removeReceiptBtn.addEventListener("click", () => {
+      resetReceiptAttachment();
+      statusMsg.textContent = "Lampiran foto struk dihapus.";
+    });
+
+    receiptPreviewImg.addEventListener("click", () => {
+      if (!attachedReceiptDataUrl) return;
+      const win = window.open("", "_blank");
+      if (win) {
+        win.document.write(`<title>Struk Belanja</title><body style="margin:0;background:#020617;display:flex;justify-content:center;align-items:center;min-height:100vh;"><img src="${attachedReceiptDataUrl}" style="max-width:100%;height:auto;" /></body>`);
+      }
+    });
+
     const rangeStartMonthInput = document.getElementById("rangeStartMonth");
     const rangeEndMonthInput = document.getElementById("rangeEndMonth");
 
@@ -1646,7 +1927,6 @@
     let isRekapListExpanded = false;
     let isDetailBreakdownExpanded = false;
 
-    // Mode tampilan di tab Filter: "monthly" (default) atau "daily"
     let filterChartMode = "monthly";
 
     let activeYearRangeFilter = null;
@@ -1999,6 +2279,7 @@
         appSection.classList.add("hidden");
         [unsubSettings, unsubBudgets, unsubSubItems, unsubTx, unsubAllTx].forEach((fn) => fn && fn());
       }
+      hideSplashScreen();
     });
 
     function subscribeAllTransactions() {
@@ -2258,10 +2539,13 @@
           date,
           month,
           note,
+          receiptDataUrl: attachedReceiptDataUrl || "",
+          receiptName: attachedReceiptName || "",
           createdBy: auth.currentUser?.email || "",
           createdAt: new Date().toISOString()
         });
         document.getElementById("txNote").value = "";
+        resetReceiptAttachment();
         applySuggestedAmount(true);
         statusMsg.textContent = "Pengeluaran berhasil dicatat.";
       } catch (err) {
@@ -2879,26 +3163,42 @@
       if (!txData.length) {
         txListEl.innerHTML = `<p class="muted">Belum ada transaksi tercatat di bulan ini.</p>`;
       } else {
-        txListEl.innerHTML = txData.map((tx) => `
-          <div class="tx-item">
-            <div style="display:flex; align-items:center; gap:9px;">
-              <div class="tx-icon-box">
-                <svg class="ico" viewBox="0 0 24 24"><path d="M4 2h16v20l-2-1.5-2 1.5-2-1.5-2 1.5-2-1.5-2 1.5-2-1.5L4 22V2z"/><line x1="8" y1="8" x2="16" y2="8"/><line x1="8" y1="12" x2="13" y2="12"/></svg>
-              </div>
-              <div>
-                <div>
-                  <strong>${tx.budgetName || tx.budgetId}</strong>
-                  ${tx.subItemName ? `• <span style="color:#67e8f9; font-weight:600;">${tx.subItemName}</span>` : ""}
+        txListEl.innerHTML = txData.map((tx) => {
+          const hasReceipt = Boolean(tx.receiptDataUrl);
+          const leftVisual = hasReceipt
+            ? `<img src="${tx.receiptDataUrl}" class="tx-receipt-thumb" data-view-receipt="${tx.id}" title="Klik untuk melihat foto struk" alt="Struk" />`
+            : `<div class="tx-icon-box"><svg class="ico" viewBox="0 0 24 24"><path d="M4 2h16v20l-2-1.5-2 1.5-2-1.5-2 1.5-2-1.5-2 1.5-2-1.5L4 22V2z"/><line x1="8" y1="8" x2="16" y2="8"/><line x1="8" y1="12" x2="13" y2="12"/></svg></div>`;
+
+          return `
+            <div class="tx-item">
+              <div style="display:flex; align-items:center; gap:9px; min-width:0;">
+                ${leftVisual}
+                <div style="min-width:0;">
+                  <div>
+                    <strong>${tx.budgetName || tx.budgetId}</strong>
+                    ${tx.subItemName ? `• <span style="color:#67e8f9; font-weight:600;">${tx.subItemName}</span>` : ""}
+                  </div>
+                  <div class="muted">${tx.date || ""} ${tx.note ? `• ${tx.note}` : ""} ${hasReceipt ? "• 📷 Struk" : ""}</div>
                 </div>
-                <div class="muted">${tx.date || ""} ${tx.note ? `• ${tx.note}` : ""}</div>
+              </div>
+              <div style="display:flex; align-items:center; gap:8px; flex-shrink:0;">
+                <strong style="color:#f87171;">-${rupiah(tx.amount)}</strong>
+                <button type="button" class="danger-btn small" data-del-tx="${tx.id}">Hapus</button>
               </div>
             </div>
-            <div style="display:flex; align-items:center; gap:8px;">
-              <strong style="color:#f87171;">-${rupiah(tx.amount)}</strong>
-              <button type="button" class="danger-btn small" data-del-tx="${tx.id}">Hapus</button>
-            </div>
-          </div>
-        `).join("");
+          `;
+        }).join("");
+
+        txListEl.querySelectorAll("[data-view-receipt]").forEach((imgEl) => {
+          imgEl.addEventListener("click", () => {
+            const targetTx = txData.find((t) => t.id === imgEl.getAttribute("data-view-receipt"));
+            if (!targetTx || !targetTx.receiptDataUrl) return;
+            const win = window.open("", "_blank");
+            if (win) {
+              win.document.write(`<title>Struk ${targetTx.budgetName || ""}</title><body style="margin:0;background:#020617;display:flex;justify-content:center;align-items:center;min-height:100vh;"><img src="${targetTx.receiptDataUrl}" style="max-width:100%;height:auto;" /></body>`);
+            }
+          });
+        });
 
         txListEl.querySelectorAll("[data-del-tx]").forEach((btn) => {
           btn.addEventListener("click", async () => {
